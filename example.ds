@@ -1,0 +1,39 @@
+// This is a comment :)
+
+fn join($elements, $seperator) {
+    val $result is ""
+    val $len is len($elements)
+
+    for $i in 0..$len {
+        val $obj is str(get($elements, $i))
+        $result is $result + $obj
+
+        if $i != $len - 1 {
+            $result is $result + $seperator
+        }
+    }
+
+    return $result
+}
+
+fn fibonacci($n) {
+    val $a is 0
+    val $b is 1
+    val $result is []
+
+    for $i in 0..$n {
+        append($result, $a)
+
+        val $temp is $a
+        $a is $b
+        $b is $temp + $b
+    }
+
+    return $result
+}
+
+print("Calculating fibonacci sequence up to 100...")
+
+val $fib is fibonacci(100)
+
+print(join($fib, " "))
