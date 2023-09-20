@@ -1,0 +1,81 @@
+Syntax:
+    Variables:
+        val $<VARIABLE_NAME> is <VALUE>
+        Example: val $my_variable is 5
+        $<VARIABLE_NAME> is <VALUE> (NOTE: This only works if the variable has already been declared)
+        Example: $my_variable is 5
+
+    If statements:
+
+        if <CONDITION> { <CODE> }
+        Example: if $my_variable = 5 { print("It's 5!") }
+
+        if <CONDITION> { <CODE> } else { <CODE> }
+        Example: if $my_variable = 5 { print("It's 5!") } else { print("It's not 5!") }
+
+        if <CONDITION> { <CODE> } else if <CONDITION> { <CODE> } else { <CODE> }
+        Example: if $my_variable = 5 { print("It's 5!") } else if $my_variable = 6 { print("It's 6!") } else { print("It's not 5 or 6!") }
+
+    Loops:
+        for $<VARIABLE_NAME> in <START>..<END> { <CODE> }
+        Example: for $i in 0..5 { print($i) }
+
+        for $<VARIABLE_NAME> in <START>..<END>..<STEP> { <CODE> }
+        Example: for $i in 0..10..2 { print($i) }
+
+        while <CONDITION> { <CODE> }
+        Example: while $my_variable < 10 { print($my_variable); $my_variable is $my_variable + 1 }
+
+    Functions:
+        fn add($a, $b) { $a + $b }
+
+        Multiline function:
+        fn add($a, $b) {
+            return $a + $b
+        }
+
+        Calling a function:
+        add(5, 6)
+
+    Lists:
+        val $my_list is [1, 2, 3]
+
+        Accessing a list:
+        get($my_list, 0) // Returns 1
+
+        Appending to a list:
+        append($my_list, 4)
+
+        Removing from a list:
+        pop($my_list, 0) // Returns 1 and removes it from the list
+
+        Merging lists:
+        extend($my_list, [5, 6, 7]) // Modifies $my_list if it's a variable. Returns the new list.
+
+    Strings:
+        val $my_string is "Hello, world!"
+        print($my_string)
+
+    Comparing:
+        <, >, <=, >=, =, !=
+        && || !
+
+    Numbers:
+        val $my_number is 5
+        val $my_float is 10.5
+
+    Booleans:
+        true false
+
+    Built-in Functions:
+        print(<VALUE>)
+        input()
+        append(<LIST>, <VALUE>)
+        pop(<LIST>, <INDEX>)
+        extend(<LIST1>, <LIST2>)
+        get(<LIST>, <INDEX>)
+        len(<VALUE>)
+        str(<VALUE>)
+
+    Comments:
+        // This is a comment
