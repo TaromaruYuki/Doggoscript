@@ -3,8 +3,10 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
+#include <config/DoggoscriptConfig.h>
 
 int run_cli(SymbolTable* symbol_table) {
+    std::cout << "Doggoscript CLI v" << DOGGOSCRIPT_VERSION_MAJOR << "." << DOGGOSCRIPT_VERSION_MINOR << "." << DOGGOSCRIPT_VERSION_PATCH << std::endl << std::endl;
     while(true) {
         std::cout << "Doggoscript > ";
 
