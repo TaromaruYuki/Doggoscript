@@ -25,10 +25,10 @@ struct BaseFunction : public Object {
     }
 
     Context generate_new_context() {
-        Context context("<function " + this->name + ">");
-        context.symbol_table = new SymbolTable(this->context->symbol_table);
-        context.parent = this->context;
-        return context;
+        Context ctx("<function " + this->name + ">");
+        ctx.symbol_table = new SymbolTable(this->context->symbol_table);
+        ctx.parent = this->context;
+        return ctx;
     }
 
     RuntimeResult check_args(std::vector<std::string> arg_names, std::vector<Object *> args) {
