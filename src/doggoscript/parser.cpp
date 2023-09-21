@@ -332,6 +332,11 @@ ParseResult Parser::atom() {
         if (result.should_return()) return result;
 
         return *result.success(list_expr);
+    } else if (value.type == TokenType::LCurly) {
+        BaseNode *dict_expr = result.reg(this->dict_expr());
+        if (result.should_return()) return result;
+
+        return *result.success(dict_expr);
     } else if (value.is_keyword("if")) {
         BaseNode *if_expr = result.reg(this->if_expr());
         if (result.should_return()) return result;
@@ -756,6 +761,80 @@ ParseResult Parser::bin_op(const std::function<ParserFunction> &func, std::vecto
     }
 
     return *result.success(left);
+}
+
+ParseResult Parser::dict_expr() {
+    ParseResult result;
+    Position start_pos = Position(this->current_token.value().start_pos.value());
+
+    if (this->current_token.value().type != TokenType::LCurly) {
+        return *result.failure(InvalidSyntaxError(
+                this->current_token.value().start_pos.value(), this->current_token.value().end_pos.value(),
+                "Expected '{'"
+        ));
+    }
+
+    result.register_advancement();
+    this->advance();
+
+    if (this->current_token.value().type == TokenType::RCurly) {
+        return *result.success(new DictNode({}, start_pos, this->current_token.value().end_pos.value()));
+    }
+
+    std::vector<std::tuple<BaseNode *, BaseNode *>> elements;
+
+    BaseNode *key = result.reg(this->atom());
+    if (result.should_return()) return result;
+
+    if (this->current_token.value().type != TokenType::Colon) {
+        return *result.failure(InvalidSyntaxError(
+                this->current_token.value().start_pos.value(), this->current_token.value().end_pos.value(),
+                "Expected ':'"
+        ));
+    }
+
+    result.register_advancement();
+    this->advance();
+
+    BaseNode *value = result.reg(this->expr());
+    if (result.should_return()) return result;
+
+    elements.emplace_back(key, value);
+
+    while (this->current_token.value().type == TokenType::Comma) {
+        result.register_advancement();
+        this->advance();
+
+        key = result.reg(this->atom());
+        if (result.should_return()) return result;
+
+        if (this->current_token.value().type != TokenType::Colon) {
+            return *result.failure(InvalidSyntaxError(
+                    this->current_token.value().start_pos.value(), this->current_token.value().end_pos.value(),
+                    "Expected ':'"
+            ));
+        }
+
+        result.register_advancement();
+        this->advance();
+
+        value = result.reg(this->expr());
+        if (result.should_return()) return result;
+
+        elements.emplace_back(key, value);
+    }
+
+    if (this->current_token.value().type != TokenType::RCurly) {
+        return *result.failure(InvalidSyntaxError(
+                this->current_token.value().start_pos.value(), this->current_token.value().end_pos.value(),
+                "Expected '}'"
+        ));
+    }
+
+    result.register_advancement();
+    this->advance();
+
+    return *result.success(new DictNode(elements, start_pos, this->current_token.value().end_pos.value()));
 }
 
 //ParseResult Parser::factor() {

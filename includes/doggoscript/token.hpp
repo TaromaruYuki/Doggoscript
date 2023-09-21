@@ -40,6 +40,7 @@ enum class TokenType {
     LSquare,
     RSquare,
     NewLine,
+    Colon,
 };
 
 const std::unordered_map<TokenType, std::string> type_to_str = {
@@ -73,6 +74,7 @@ const std::unordered_map<TokenType, std::string> type_to_str = {
         {TokenType::LSquare,           "LSquare"},
         {TokenType::RSquare,           "RSquare"},
         {TokenType::NewLine,           "NewLine"},
+        {TokenType::Colon, "Colon"},
 };
 
 const std::vector<std::string> keywords = {

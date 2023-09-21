@@ -35,6 +35,10 @@ LexerResult Lexer::tokenize() {
             case '*':
                 tokens.push_back(this->create_power());
                 break;
+            case ':':
+                tokens.emplace_back(TokenType::Colon, std::nullopt, Position(this->position), std::nullopt);
+                this->advance();
+                break;
             case '/': {
                 auto token = this->create_div_or_comment();
                 if (token.has_value()) {

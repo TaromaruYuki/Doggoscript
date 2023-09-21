@@ -9,6 +9,7 @@ enum class ObjectType {
     Boolean,
     Function,
     List,
+    Dict,
     Number,
     Object,
     Statements,
