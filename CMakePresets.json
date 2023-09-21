@@ -1,0 +1,113 @@
+﻿{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "windows-base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/windows/${presetName}",
+            "installDir": "${sourceDir}/build/windows/${presetName}-install",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl.exe",
+                "CMAKE_CXX_COMPILER": "cl.exe"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "win-x64-relwithdebinfo",
+            "displayName": "Windows x64 RelWithDebInfo",
+            "inherits": "windows-base",
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "win-x64-dist",
+            "displayName": "Windows x64 Dist",
+            "inherits": "win-x64-relwithdebinfo",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "win-x86-relwithdebinfo",
+            "displayName": "Windows x86 RelWithDebInfo",
+            "inherits": "windows-base",
+            "architecture": {
+                "value": "x86",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "win-x86-dist",
+            "displayName": "Windows x86 Dist",
+            "inherits": "win-x86-relwithdebinfo",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "linux-base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/linux/${presetName}",
+            "installDir": "${sourceDir}/build/linux/${presetName}-install",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "linux-x64-relwithdebinfo",
+            "displayName": "Linux x64 RelWithDebInfo",
+            "inherits": "linux-base",
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "linux-x64-dist",
+            "displayName": "Linux x64 Dist",
+            "inherits": "linux-x64-relwithdebinfo",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "linux-x86-relwithdebinfo",
+            "displayName": "Linux x86 RelWithDebInfo",
+            "inherits": "linux-base",
+            "architecture": {
+                "value": "x86",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "linux-x86-dist",
+            "displayName": "Linux x86 Dist",
+            "inherits": "linux-x86-relwithdebinfo",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
+    ]
+}
