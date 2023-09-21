@@ -30,6 +30,13 @@ public:
     }
 
     void set(std::string name, Object *value) {
+        if (this->parent.has_value()) {
+            if (this->parent.value()->get(name) != nullptr) {
+                this->parent.value()->set(name, value);
+                return;
+            }
+        }
+
         this->symbols[name] = value;
     }
 

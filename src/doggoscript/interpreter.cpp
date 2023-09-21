@@ -505,14 +505,17 @@ RuntimeResult Interpreter::visit_BreakNode(BreakNode *node, Context &context) {
 
 RuntimeResult Interpreter::visit_IfNode(IfNode *node, Context &context) {
     RuntimeResult result;
+    Context if_context("");
+    auto *if_symbol_table = new SymbolTable(context.symbol_table);
+    if_context.symbol_table = if_symbol_table;
 
     for (auto &case_: node->cases) {
-        std::optional<Object *> condition = result.reg(this->visit(std::get<0>(case_), context));
+        std::optional<Object *> condition = result.reg(this->visit(std::get<0>(case_), if_context));
         if (result.should_return())
             return result;
 
         if (condition.has_value() && condition.value()->is_true()) {
-            std::optional<Object *> value = result.reg(this->visit(std::get<1>(case_), context));
+            std::optional<Object *> value = result.reg(this->visit(std::get<1>(case_), if_context));
             if (result.should_return())
                 return result;
 
@@ -525,7 +528,7 @@ RuntimeResult Interpreter::visit_IfNode(IfNode *node, Context &context) {
 
     if (node->else_case.has_value()) {
         auto else_ = node->else_case.value();
-        std::optional<Object *> value = result.reg(this->visit(std::get<0>(else_), context));
+        std::optional<Object *> value = result.reg(this->visit(std::get<0>(else_), if_context));
         if (result.should_return())
             return result;
 
@@ -538,19 +541,22 @@ RuntimeResult Interpreter::visit_IfNode(IfNode *node, Context &context) {
 
 RuntimeResult Interpreter::visit_ForNode(ForNode *node, Context &context) {
     RuntimeResult result;
+    Context for_context("");
+    auto *for_symbol_table = new SymbolTable(context.symbol_table);
+    for_context.symbol_table = for_symbol_table;
 
-    std::optional<Object *> start_value_o = result.reg(this->visit(node->start_value, context));
+    std::optional<Object *> start_value_o = result.reg(this->visit(node->start_value, for_context));
     if (result.should_return())
         return result;
 
-    std::optional<Object *> end_value_o = result.reg(this->visit(node->end_value, context));
+    std::optional<Object *> end_value_o = result.reg(this->visit(node->end_value, for_context));
     if (result.should_return())
         return result;
 
     std::optional<Object *> step_value_o;
 
     if (node->step_value != nullptr) {
-        step_value_o = result.reg(this->visit(node->step_value, context));
+        step_value_o = result.reg(this->visit(node->step_value, for_context));
         if (result.should_return())
             return result;
     } else {
@@ -590,10 +596,10 @@ RuntimeResult Interpreter::visit_ForNode(ForNode *node, Context &context) {
     }
 
     while (cond(i, end_value->value)) {
-        context.symbol_table->set(node->token->value, new Number(i));
+        for_symbol_table->set(node->token->value, new Number(i));
         i += step_value->value;
 
-        std::optional<Object *> value = result.reg(this->visit(node->body, context));
+        std::optional<Object *> value = result.reg(this->visit(node->body, for_context));
         if (result.should_return())
             return result;
 
@@ -609,16 +615,19 @@ RuntimeResult Interpreter::visit_ForNode(ForNode *node, Context &context) {
 
 RuntimeResult Interpreter::visit_WhileNode(WhileNode *node, Context &context) {
     RuntimeResult result;
+    Context while_context("");
+    auto *while_symbol_table = new SymbolTable(context.symbol_table);
+    while_context.symbol_table = while_symbol_table;
 
     while (true) {
-        std::optional<Object *> condition = result.reg(this->visit(node->condition, context));
+        std::optional<Object *> condition = result.reg(this->visit(node->condition, while_context));
         if (result.should_return())
             return result;
 
         if (!condition.value()->is_true())
             break;
 
-        std::optional<Object *> value = result.reg(this->visit(node->body, context));
+        std::optional<Object *> value = result.reg(this->visit(node->body, while_context));
         if (result.should_return() && !result.loop_should_continue && !result.loop_should_break)
             return result;
 
