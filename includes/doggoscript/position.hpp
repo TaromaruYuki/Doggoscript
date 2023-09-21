@@ -11,13 +11,13 @@ struct Position {
     std::string file_contents;
 
     Position(std::string file_name, std::string file_contents)
-        : file_name(std::move(file_name)), file_contents(file_contents) { }
+            : file_name(std::move(file_name)), file_contents(file_contents) {}
 
     void advance(char current_character = '\0') {
         this->index++;
         this->column++;
 
-        if(current_character == '\n') {
+        if (current_character == '\n') {
             this->line_number++;
             this->column = 0;
         }

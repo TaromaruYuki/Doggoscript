@@ -19,14 +19,14 @@ struct Object {
     ObjectType type;
     std::optional<Position> start_pos;
     std::optional<Position> end_pos;
-    Context* context;
+    Context *context;
 
     void set_pos(Position start_pos, Position end_pos) {
         this->start_pos = start_pos;
         this->end_pos = end_pos;
     }
 
-    void set_context(Context* context) {
+    void set_context(Context *context) {
         this->context = context;
     }
 

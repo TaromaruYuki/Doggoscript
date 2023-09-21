@@ -11,10 +11,10 @@
 #include "types/types.hpp"
 
 struct DoggoscriptResult {
-    std::optional<Object*> result;
+    std::optional<Object *> result;
     std::optional<BaseError> error;
 };
 
-DoggoscriptResult run(std::string src, SymbolTable* symbol_table);
+DoggoscriptResult run(std::string src, SymbolTable *symbol_table);
 
-void populate_symbol_table(SymbolTable* symbol_table);
+void populate_symbol_table(SymbolTable *symbol_table);

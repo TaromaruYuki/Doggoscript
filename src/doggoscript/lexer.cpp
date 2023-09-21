@@ -1,7 +1,7 @@
 #include "../../includes/doggoscript/lexer.hpp"
 
 void Lexer::advance() {
-    if(this->position.index < this->src.size()) {
+    if (this->position.index < this->src.size()) {
         this->current_character = src[this->position.index];
     } else {
         this->current_character = '\0';
@@ -10,11 +10,11 @@ void Lexer::advance() {
     this->position.advance(this->current_character);
 }
 
-LexerResult Lexer::tokenize()  {
+LexerResult Lexer::tokenize() {
     std::vector<Token> tokens;
 
-    while(this->current_character != '\0') {
-        switch(this->current_character) {
+    while (this->current_character != '\0') {
+        switch (this->current_character) {
             case ' ':
             case '\t':
                 this->advance();
@@ -40,7 +40,8 @@ LexerResult Lexer::tokenize()  {
                 if (token.has_value()) {
                     tokens.push_back(token.value());
                 }
-            } break;
+            }
+                break;
             case '(':
                 tokens.emplace_back(TokenType::LParen, std::nullopt, Position(this->position), std::nullopt);
                 this->advance();
@@ -71,7 +72,8 @@ LexerResult Lexer::tokenize()  {
                 identifier.type = TokenType::Variable;
                 identifier.value = "$" + identifier.value;
                 tokens.push_back(identifier);
-            } break;
+            }
+                break;
             case '=':
                 tokens.emplace_back(TokenType::EqualsTo, std::nullopt, Position(this->position), std::nullopt);
                 this->advance();
@@ -91,39 +93,42 @@ LexerResult Lexer::tokenize()  {
                 break;
             case '.': {
                 auto token = this->create_through();
-                if(std::get<1>(token).has_value()) {
+                if (std::get<1>(token).has_value()) {
                     return {.error = std::get<1>(token).value()};
                 }
 
                 tokens.push_back(std::get<0>(token).value());
-            } break;
+            }
+                break;
             case '&': {
                 auto token = this->create_and();
-                if(std::get<1>(token).has_value()) {
+                if (std::get<1>(token).has_value()) {
                     return {.error = std::get<1>(token).value()};
                 }
 
                 tokens.push_back(std::get<0>(token).value());
-            } break;
+            }
+                break;
             case '|': {
                 auto token = this->create_or();
-                if(std::get<1>(token).has_value()) {
+                if (std::get<1>(token).has_value()) {
                     return {.error = std::get<1>(token).value()};
                 }
 
                 tokens.push_back(std::get<0>(token).value());
-            } break;
+            }
+                break;
             case '"':
                 tokens.push_back(this->create_string());
                 break;
             default: {
-                if(std::isalpha(this->current_character) || this->current_character == '_') {
+                if (std::isalpha(this->current_character) || this->current_character == '_') {
                     tokens.push_back(this->create_identifier());
-                } else if(isdigit(this->current_character)) {
+                } else if (isdigit(this->current_character)) {
                     auto num = this->create_number();
                     tokens.push_back(std::get<0>(num));
 
-                    if(std::get<1>(num).has_value()) {
+                    if (std::get<1>(num).has_value()) {
                         tokens.push_back(std::get<1>(num).value());
                     }
                 } else {
@@ -132,7 +137,8 @@ LexerResult Lexer::tokenize()  {
                     this->advance();
                     return {.error = IllegalCharacterError(pos_start, this->position, character)};
                 }
-            } break;
+            }
+                break;
         }
     }
 
@@ -148,10 +154,10 @@ std::tuple<Token, std::optional<Token>> Lexer::create_number() {
     std::optional<Token> through_token;
     char prev_character = '\0';
 
-    while(this->current_character != '\0' && (isdigit(this->current_character) || this->current_character == '.')) {
-        if(this->current_character == '.') {
-            if(dot_count == 1) {
-                if(prev_character == '.') {
+    while (this->current_character != '\0' && (isdigit(this->current_character) || this->current_character == '.')) {
+        if (this->current_character == '.') {
+            if (dot_count == 1) {
+                if (prev_character == '.') {
                     through_token = Token(TokenType::Through, std::nullopt, start_pos, Position(this->position));
                     this->advance();
                     num.pop_back();
@@ -170,18 +176,18 @@ std::tuple<Token, std::optional<Token>> Lexer::create_number() {
 
     Token token(TokenType::Int, num, start_pos, Position(this->position));
 
-    if(dot_count == 1) {
+    if (dot_count == 1) {
         token.type = TokenType::Float;
     }
 
-    return { token, through_token };
+    return {token, through_token};
 }
 
 Token Lexer::create_power() {
     Position start_pos(this->position);
     this->advance();
 
-    if(this->current_character == '*') {
+    if (this->current_character == '*') {
         this->advance();
         return {TokenType::Power, std::nullopt, start_pos, Position(this->position)};
     }
@@ -196,21 +202,21 @@ Token Lexer::create_string() {
     this->advance();
 
     std::unordered_map<char, char> escape_characters = {
-        { 'n', '\n' },
-        { 't', '\t' },
-        { 'r', '\r' },
+            {'n', '\n'},
+            {'t', '\t'},
+            {'r', '\r'},
     };
 
-    while(this->current_character != '\0' && (this->current_character != '"' || escape_character)) {
-        if(escape_character) {
-            if(escape_characters.find(this->current_character) != escape_characters.end()) {
+    while (this->current_character != '\0' && (this->current_character != '"' || escape_character)) {
+        if (escape_character) {
+            if (escape_characters.find(this->current_character) != escape_characters.end()) {
                 str.push_back(escape_characters[this->current_character]);
             } else {
                 str.push_back(this->current_character);
             }
             escape_character = false;
         } else {
-            if(this->current_character == '\\') {
+            if (this->current_character == '\\') {
                 escape_character = true;
             } else {
                 str.push_back(this->current_character);
@@ -223,20 +229,21 @@ Token Lexer::create_string() {
     this->advance();
 
     return {TokenType::String, str, start_pos, Position(this->position)};
- }
+}
 
 Token Lexer::create_identifier() {
     std::string identifier;
     Position start_pos(this->position);
 
-    while(this->current_character != '\0' && (std::isalnum(this->current_character) || this->current_character == '_')) {
+    while (this->current_character != '\0' &&
+           (std::isalnum(this->current_character) || this->current_character == '_')) {
         identifier.push_back(this->current_character);
         this->advance();
     }
 
     Token token(TokenType::Identifier, identifier, start_pos, Position(this->position));
 
-    if(std::find(keywords.begin(), keywords.end(), identifier) != keywords.end()) {
+    if (std::find(keywords.begin(), keywords.end(), identifier) != keywords.end()) {
         token.type = TokenType::Keyword;
     }
 
@@ -247,7 +254,7 @@ Token Lexer::create_not_equals() {
     Position start_pos(this->position);
     this->advance();
 
-    if(this->current_character == '=') {
+    if (this->current_character == '=') {
         this->advance();
         return {TokenType::NotEquals, std::nullopt, start_pos, Position(this->position)};
     }
@@ -259,7 +266,7 @@ Token Lexer::create_greater_than() {
     Position start_pos(this->position);
     this->advance();
 
-    if(this->current_character == '=') {
+    if (this->current_character == '=') {
         this->advance();
         return {TokenType::GreaterThanEquals, std::nullopt, start_pos, Position(this->position)};
     }
@@ -271,7 +278,7 @@ Token Lexer::create_less_than() {
     Position start_pos(this->position);
     this->advance();
 
-    if(this->current_character == '=') {
+    if (this->current_character == '=') {
         this->advance();
         return {TokenType::LessThanEquals, std::nullopt, start_pos, Position(this->position)};
     }
@@ -283,7 +290,7 @@ std::tuple<std::optional<Token>, std::optional<BaseError>> Lexer::create_and() {
     Position start_pos(this->position);
     this->advance();
 
-    if(this->current_character == '&') {
+    if (this->current_character == '&') {
         this->advance();
         return {Token(TokenType::LogicalAnd, std::nullopt, start_pos, Position(this->position)), std::nullopt};
     }
@@ -295,7 +302,7 @@ std::tuple<std::optional<Token>, std::optional<BaseError>> Lexer::create_or() {
     Position start_pos(this->position);
     this->advance();
 
-    if(this->current_character == '|') {
+    if (this->current_character == '|') {
         this->advance();
         return {Token(TokenType::LogicalOr, std::nullopt, start_pos, Position(this->position)), std::nullopt};
     }
@@ -307,7 +314,7 @@ std::tuple<std::optional<Token>, std::optional<BaseError>> Lexer::create_through
     Position start_pos(this->position);
     this->advance();
 
-    if(this->current_character == '.') {
+    if (this->current_character == '.') {
         this->advance();
         return {Token(TokenType::Through, std::nullopt, start_pos, Position(this->position)), std::nullopt};
     }
@@ -319,8 +326,8 @@ std::optional<Token> Lexer::create_div_or_comment() {
     Position start_pos(this->position);
     this->advance();
 
-    if(this->current_character == '/') {
-        while(this->current_character != '\n' && this->current_character != '\0') {
+    if (this->current_character == '/') {
+        while (this->current_character != '\n' && this->current_character != '\0') {
             this->advance();
         }
 

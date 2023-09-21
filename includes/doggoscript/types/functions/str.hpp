@@ -5,7 +5,7 @@
 struct StrFunction : public BuiltInFunction {
     StrFunction() : BuiltInFunction("str", {"value"}, StrFunction::call) {}
 
-    static RuntimeResult call(std::vector<Object*> args) {
+    static RuntimeResult call(std::vector<Object *> args) {
         RuntimeResult result;
 
         return *result.success(new String(args[0]->print_friendly()));

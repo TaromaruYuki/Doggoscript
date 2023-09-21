@@ -10,8 +10,11 @@ typedef std::tuple<std::optional<Number>, std::optional<BaseError>> NumberResult
 
 struct Number : public Object {
     double value;
+
     Number() : value(0) { this->type = ObjectType::Number; }
+
     explicit Number(std::string value) : value(std::stod(value)) { this->type = ObjectType::Number; }
+
     explicit Number(double value) : value(value) { this->type = ObjectType::Number; }
 
     std::string str() {
@@ -22,46 +25,46 @@ struct Number : public Object {
         return this->value != 0;
     }
 
-    NumberResult operator+(const Number& other) const {
+    NumberResult operator+(const Number &other) const {
         return {Number(this->value + other.value), std::nullopt};
     }
 
-    NumberResult operator-(const Number& other) const {
+    NumberResult operator-(const Number &other) const {
         return {Number(this->value - other.value), std::nullopt};
     }
 
-    NumberResult operator*(const Number& other) const {
+    NumberResult operator*(const Number &other) const {
         return {Number(this->value * other.value), std::nullopt};
     }
 
-    NumberResult operator/(const Number& other) const {
-        if(other.value == 0)
+    NumberResult operator/(const Number &other) const {
+        if (other.value == 0)
             return {std::nullopt, ArithmeticError(this->start_pos.value(), this->end_pos.value(), "Division by zero")};
 
         return {Number(this->value / other.value), std::nullopt};
     }
 
-    BooleanResult operator<(const Number& other) const {
+    BooleanResult operator<(const Number &other) const {
         return {Boolean(this->value < other.value), std::nullopt};
     }
 
-    BooleanResult operator>(const Number& other) const {
+    BooleanResult operator>(const Number &other) const {
         return {Boolean(this->value > other.value), std::nullopt};
     }
 
-    BooleanResult operator<=(const Number& other) const {
+    BooleanResult operator<=(const Number &other) const {
         return {Boolean(this->value <= other.value), std::nullopt};
     }
 
-    BooleanResult operator>=(const Number& other) const {
+    BooleanResult operator>=(const Number &other) const {
         return {Boolean(this->value >= other.value), std::nullopt};
     }
 
-    BooleanResult operator==(const Number& other) const {
+    BooleanResult operator==(const Number &other) const {
         return {Boolean(this->value == other.value), std::nullopt};
     }
 
-    BooleanResult operator!=(const Number& other) const {
+    BooleanResult operator!=(const Number &other) const {
         return {Boolean(this->value != other.value), std::nullopt};
     }
 
