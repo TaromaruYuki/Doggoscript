@@ -9,5 +9,6 @@
 ## Reporting a Vulnerability
 
 To report a vulnerability, please email `github.7wmif@simplelogin.com` with a subject indicating a vulnerability.
+Or create a new GitHub vulnerabilty report in the security tab.
 
 DO NOT create a issue. Vulnerability updates will come out shortly after they are reported, as long as they are valid.
