@@ -29,15 +29,10 @@ LexerResult Lexer::tokenize() {
                 this->advance();
                 break;
             case '-':
-                tokens.emplace_back(TokenType::Minus, std::nullopt, Position(this->position), std::nullopt);
-                this->advance();
+                tokens.push_back(this->create_minus_or_arrow());
                 break;
             case '*':
                 tokens.push_back(this->create_power());
-                break;
-            case ':':
-                tokens.emplace_back(TokenType::Colon, std::nullopt, Position(this->position), std::nullopt);
-                this->advance();
                 break;
             case '/': {
                 auto token = this->create_div_or_comment();
@@ -82,10 +77,6 @@ LexerResult Lexer::tokenize() {
                 tokens.emplace_back(TokenType::EqualsTo, std::nullopt, Position(this->position), std::nullopt);
                 this->advance();
                 break;
-            case ',':
-                tokens.emplace_back(TokenType::Comma, std::nullopt, Position(this->position), std::nullopt);
-                this->advance();
-                break;
             case '!':
                 tokens.push_back(this->create_not_equals());
                 break;
@@ -103,6 +94,10 @@ LexerResult Lexer::tokenize() {
 
                 tokens.push_back(std::get<0>(token).value());
             }
+                break;
+            case ',':
+                tokens.emplace_back(TokenType::Comma, std::nullopt, Position(this->position), std::nullopt);
+                this->advance();
                 break;
             case '&': {
                 auto token = this->create_and();
@@ -340,6 +335,18 @@ std::optional<Token> Lexer::create_div_or_comment() {
     }
 
     return Token(TokenType::Divide, std::nullopt, start_pos, Position(this->position));
+}
+
+Token Lexer::create_minus_or_arrow() {
+    Position start_pos(this->position);
+    this->advance();
+
+    if (this->current_character == '>') {
+        this->advance();
+        return {TokenType::Arrow, std::nullopt, start_pos, Position(this->position)};
+    }
+
+    return {TokenType::Minus, std::nullopt, start_pos, Position(this->position)};
 }
 
 

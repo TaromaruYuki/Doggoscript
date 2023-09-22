@@ -26,6 +26,8 @@ class Lexer {
 
     Token create_power();
 
+    Token create_minus_or_arrow();
+
     Token create_string();
 
     Token create_identifier();

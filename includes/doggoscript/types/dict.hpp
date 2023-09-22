@@ -20,8 +20,13 @@ struct Dict : public Object {
     std::string str() {
         std::string s = "{";
 
-        for (auto const &[key, value]: this->elements) {
-            s += key->str() + ": " + value->str() + ", ";
+        for (size_t i = 0; i < this->elements.size(); i++) {
+            auto [key, value] = this->elements[i];
+            s += key->str() + " -> " + value->str();
+
+            if (i != this->elements.size() - 1) {
+                s += ", ";
+            }
         }
 
         s += "}";

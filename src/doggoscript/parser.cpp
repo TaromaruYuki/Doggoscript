@@ -786,10 +786,10 @@ ParseResult Parser::dict_expr() {
         BaseNode *key = result.reg(this->atom());
         if (result.should_return()) return result;
 
-        if (this->current_token.value().type != TokenType::Colon) {
+        if (this->current_token.value().type != TokenType::Arrow) {
             return *result.failure(InvalidSyntaxError(
                     this->current_token.value().start_pos.value(), this->current_token.value().end_pos.value(),
-                    "Expected ':'"
+                    "Expected '->'"
             ));
         }
 
@@ -808,10 +808,10 @@ ParseResult Parser::dict_expr() {
             key = result.reg(this->atom());
             if (result.should_return()) return result;
 
-            if (this->current_token.value().type != TokenType::Colon) {
+            if (this->current_token.value().type != TokenType::Arrow) {
                 return *result.failure(InvalidSyntaxError(
                         this->current_token.value().start_pos.value(), this->current_token.value().end_pos.value(),
-                        "Expected ':'"
+                        "Expected '->'"
                 ));
             }
 
