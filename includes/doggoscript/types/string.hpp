@@ -4,9 +4,6 @@
 #include <string>
 #include "object.hpp"
 
-struct String;
-typedef std::tuple<std::optional<String>, std::optional<BaseError>> StringResult;
-
 struct String : public Object {
     std::string value;
 
@@ -26,7 +23,13 @@ struct String : public Object {
         return !this->value.empty();
     }
 
-    StringResult operator+(const String &other) const {
-        return {String(this->value + other.value), std::nullopt};
+    ObjectResult operator+(Object &other) override {
+        if (other.type == ObjectType::String) {
+            auto *other_string = dynamic_cast<String *>(&other);
+
+            return {new String(this->value + other_string->value), std::nullopt};
+        }
+
+        return Object::operator+(other);
     }
 };

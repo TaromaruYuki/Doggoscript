@@ -113,3 +113,9 @@ public:
     ArgumentError(Position start_pos, Position end_pos, std::string details)
             : BaseError(start_pos, end_pos, "Argument Error", details) {}
 };
+
+class TypeError : public BaseError {
+public:
+    TypeError(Position start_pos, Position end_pos, std::string details)
+            : BaseError(start_pos, end_pos, "Type Error", details) {}
+};

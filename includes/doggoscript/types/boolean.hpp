@@ -3,10 +3,6 @@
 #include <tuple>
 #include "object.hpp"
 
-struct Boolean;
-
-typedef std::tuple<std::optional<Boolean>, std::optional<BaseError>> BooleanResult;
-
 struct Boolean : public Object {
     bool value;
 
@@ -24,19 +20,37 @@ struct Boolean : public Object {
         return this->value;
     }
 
-    [[maybe_unused]] BooleanResult equals(const Boolean &other) const {
-        return {Boolean(this->value == other.value), std::nullopt};
+    ObjectResult operator!=(Object &other) override {
+        if (other.type == ObjectType::Boolean) {
+            auto *other_boolean = dynamic_cast<Boolean *>(&other);
+
+            return {new Boolean(this->value != other_boolean->value), std::nullopt};
+        }
+
+        return Object::operator!=(other);
     }
 
-    [[nodiscard]] BooleanResult logical_and(const Boolean &other) const {
-        return {Boolean(this->value && other.value), std::nullopt};
+    ObjectResult logical_and(Object &other) override {
+        if (other.type == ObjectType::Boolean) {
+            auto *other_boolean = dynamic_cast<Boolean *>(&other);
+
+            return {new Boolean(this->value && other_boolean->value), std::nullopt};
+        }
+
+        return Object::logical_and(other);
     }
 
-    [[nodiscard]] BooleanResult logical_or(const Boolean &other) const {
-        return {Boolean(this->value || other.value), std::nullopt};
+    ObjectResult logical_or(Object &other) override {
+        if (other.type == ObjectType::Boolean) {
+            auto *other_boolean = dynamic_cast<Boolean *>(&other);
+
+            return {new Boolean(this->value || other_boolean->value), std::nullopt};
+        }
+
+        return Object::logical_and(other);
     }
 
-    [[nodiscard]] BooleanResult logical_not() const {
-        return {Boolean(!this->value), std::nullopt};
+    ObjectResult logical_not() override {
+        return {new Boolean(!this->value), std::nullopt};
     }
 };

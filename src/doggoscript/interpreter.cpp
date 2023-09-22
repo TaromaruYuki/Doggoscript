@@ -102,231 +102,102 @@ RuntimeResult Interpreter::visit_BinaryOperationNode(BinaryOperationNode *node, 
     if (result.should_return())
         return result;
 
-    Object *left_o = left_o_res.value();
-
-    if (left_o->type != ObjectType::Number && left_o->type != ObjectType::Boolean && left_o->type != ObjectType::String)
-        return *result.failure(IllegalOperationError(
-                *node->start_pos, *node->end_pos,
-                "Expected number, boolean, or string"
-        ));
-
-    Number *left = static_cast<Number *>(left_o);
+    Object *left = left_o_res.value();
 
     std::optional<Object *> right_o_res = result.reg(this->visit(node->rhs, context));
     if (result.should_return())
         return result;
 
-    Object *right_o = right_o_res.value();
-
-    if (right_o->type != ObjectType::Number && right_o->type != ObjectType::Boolean &&
-        right_o->type != ObjectType::String)
-        return *result.failure(IllegalOperationError(
-                *node->start_pos, *node->end_pos,
-                "Expected number, boolean, or string"
-        ));
-
-    Number *right = static_cast<Number *>(right_o);
-
-    std::optional<NumberResult> num_result;
-    std::optional<BooleanResult> bool_result;
-    std::optional<StringResult> str_result;
+    Object *right = right_o_res.value();
+    std::optional<ObjectResult> obj_result;
 
     switch (node->token->type) {
         case TokenType::Plus: {
-            if (left->type == ObjectType::Number && right->type == ObjectType::Number)
-                num_result = *left + *right;
-            else if (left->type == ObjectType::String && right->type == ObjectType::String) {
-                auto *left_string = static_cast<String *>(left_o);
-                auto *right_string = static_cast<String *>(right_o);
-
-                str_result = *left_string + *right_string;
-            } else
-                return *result.failure(IllegalOperationError(
-                        *node->start_pos, *node->end_pos,
-                        "Operator '+' can only be between two numbers or string."
-                ));
+            obj_result = *left + *right;
         }
             break;
         case TokenType::Minus: {
-            if (left->type == ObjectType::Number && right->type == ObjectType::Number)
-                num_result = *left - *right;
-            else
-                return *result.failure(IllegalOperationError(
-                        *node->start_pos, *node->end_pos,
-                        "Operator '-' can only be between two numbers."
-                ));
+            obj_result = *left - *right;
         }
             break;
         case TokenType::Multiply: {
-            if (left->type == ObjectType::Number && right->type == ObjectType::Number)
-                num_result = *left * *right;
-            else
-                return *result.failure(IllegalOperationError(
-                        *node->start_pos, *node->end_pos,
-                        "Operator '*' can only be between two numbers."
-                ));
+            obj_result = *left * *right;
         }
             break;
         case TokenType::Divide: {
-            if (left->type == ObjectType::Number && right->type == ObjectType::Number)
-                num_result = *left / *right;
-            else
-                return *result.failure(IllegalOperationError(
-                        *node->start_pos, *node->end_pos,
-                        "Operator '/' can only be between two numbers."
-                ));
+            obj_result = *left / *right;
         }
             break;
         case TokenType::LogicalAnd: {
-            if (left->type == ObjectType::Number && right->type == ObjectType::Number)
-                bool_result = left->logical_and(*right);
-            else {
-                auto *left_boolean = static_cast<Boolean *>(left_o);
-                auto *right_boolean = static_cast<Boolean *>(right_o);
-
-                bool_result = left_boolean->logical_and(*right_boolean);
-            }
+            obj_result = left->logical_and(*right);
         }
             break;
         case TokenType::LogicalOr: {
-            if (left->type == ObjectType::Number && right->type == ObjectType::Number)
-                bool_result = left->logical_or(*right);
-            else {
-                auto *left_boolean = static_cast<Boolean *>(left_o);
-                auto *right_boolean = static_cast<Boolean *>(right_o);
-
-                bool_result = left_boolean->logical_or(*right_boolean);
-            }
+            obj_result = left->logical_or(*right);
         }
             break;
         case TokenType::LessThan: {
-            if (left->type == ObjectType::Number && right->type == ObjectType::Number)
-                bool_result = *left < *right;
-            else
-                return *result.failure(IllegalOperationError(
-                        *node->start_pos, *node->end_pos,
-                        "Operator '<' can only be between two numbers."
-                ));
+            obj_result = *left < *right;
         }
             break;
         case TokenType::GreaterThan: {
-            if (left->type == ObjectType::Number && right->type == ObjectType::Number)
-                bool_result = *left > *right;
-            else
-                return *result.failure(IllegalOperationError(
-                        *node->start_pos, *node->end_pos,
-                        "Operator '>' can only be between two numbers."
-                ));
+            obj_result = *left > *right;
         }
             break;
         case TokenType::LessThanEquals: {
-            if (left->type == ObjectType::Number && right->type == ObjectType::Number)
-                bool_result = *left <= *right;
-            else
-                return *result.failure(IllegalOperationError(
-                        *node->start_pos, *node->end_pos,
-                        "Operator '<=' can only be between two numbers."
-                ));
+            obj_result = *left <= *right;
         }
             break;
         case TokenType::GreaterThanEquals: {
-            if (left->type == ObjectType::Number && right->type == ObjectType::Number)
-                bool_result = *left >= *right;
-            else
-                return *result.failure(IllegalOperationError(
-                        *node->start_pos, *node->end_pos,
-                        "Operator '>=' can only be between two numbers."
-                ));
+            obj_result = *left >= *right;
         }
             break;
         case TokenType::EqualsTo: {
-            if (left->type == ObjectType::Number && right->type == ObjectType::Number)
-                bool_result = *left == *right;
-            else
-                return *result.failure(IllegalOperationError(
-                        *node->start_pos, *node->end_pos,
-                        "Operator '=' can only be between two numbers."
-                ));
+            obj_result = *left == *right;
         }
+            break;
         case TokenType::NotEquals: {
-            if (left->type == ObjectType::Number && right->type == ObjectType::Number)
-                bool_result = *left != *right;
-            else
-                return *result.failure(IllegalOperationError(
-                        *node->start_pos, *node->end_pos,
-                        "Operator '!=' can only be between two numbers."
-                ));
+            obj_result = *left != *right;
         }
+            break;
     }
 
-    if (num_result.has_value()) {
-        if (std::get<1>(num_result.value()).has_value())
-            return *result.failure(std::get<1>(num_result.value()).value());
+    if (std::get<1>(obj_result.value()).has_value())
+        return *result.failure(std::get<1>(obj_result.value()).value());
 
-        Number *num = new Number(std::get<0>(num_result.value()).value());
-        num->set_pos(*node->start_pos, *node->end_pos);
+    auto *obj = std::get<0>(obj_result.value()).value();
+    obj->set_pos(*node->start_pos, *node->end_pos);
 
-        return *result.success(num);
-    } else if (str_result.has_value()) {
-        if (std::get<1>(str_result.value()).has_value())
-            return *result.failure(std::get<1>(str_result.value()).value());
-
-        String *string = new String(std::get<0>(str_result.value()).value());
-        string->set_pos(*node->start_pos, *node->end_pos);
-
-        return *result.success(string);
-    } else {
-        if (std::get<1>(bool_result.value()).has_value())
-            return *result.failure(std::get<1>(bool_result.value()).value());
-
-        Boolean *boolean = new Boolean(std::get<0>(bool_result.value()).value());
-        boolean->set_pos(*node->start_pos, *node->end_pos);
-
-        return *result.success(boolean);
-    }
+    return *result.success(obj);
 }
 
 RuntimeResult Interpreter::visit_UnaryOperationNode(UnaryOperationNode *node, Context &context) {
     RuntimeResult result;
-    std::optional<Object *> num_o_res = result.reg(this->visit(node->value, context));
+    std::optional<Object *> obj_res = result.reg(this->visit(node->value, context));
     if (result.should_return())
         return result;
 
-    Object *num_o = num_o_res.value();
+    Object *obj = obj_res.value();
 
-    if (num_o->type == ObjectType::Number) {
-        auto *num = static_cast<Number *>(num_o);
+    if (node->token->type == TokenType::Minus) {
+        Number neg_1 = Number(-1);
+        neg_1.set_context(&context);
+        ObjectResult res = *obj * neg_1;
 
-        if (node->token->type == TokenType::Minus) {
-            Number neg_1 = Number(-1);
-            neg_1.set_context(&context);
-            NumberResult res = *num * neg_1;
-            if (std::get<1>(res).has_value())
-                return *result.failure(std::get<1>(res).value());
+        if (std::get<1>(res).has_value())
+            return *result.failure(std::get<1>(res).value());
 
-            num = new Number(std::get<0>(res).value());
-        }
+        obj = std::get<0>(res).value();
+    } else if (node->token->type == TokenType::LogicalNot) {
+        ObjectResult res = obj->logical_not();
 
-        return *result.success(num);
-    } else if (num_o->type == ObjectType::Boolean) {
-        auto *boolean = static_cast<Boolean *>(num_o);
+        if (std::get<1>(res).has_value())
+            return *result.failure(std::get<1>(res).value());
 
-        if (node->token->type == TokenType::LogicalNot) {
-            BooleanResult res = boolean->logical_not();
-
-            if (std::get<1>(res).has_value())
-                return *result.failure(std::get<1>(res).value());
-
-            boolean = new Boolean(std::get<0>(res).value());
-        }
-
-        return *result.success(boolean);
+        obj = std::get<0>(res).value();
     }
 
-    return *result.failure(IllegalOperationError(
-            *node->start_pos, *node->end_pos,
-            "Expected number or boolean"
-    ));
+    return *result.success(obj);
 }
 
 RuntimeResult Interpreter::visit_StatementsNode(StatementsNode *node, Context &context) {
