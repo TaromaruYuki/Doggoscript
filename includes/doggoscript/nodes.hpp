@@ -14,6 +14,7 @@ enum class NodeType {
     IdentifierNode,             // Done
     StringNode,                 // Done
     ListNode,                   // Done
+    DictNode,                   // Not Done
     StatementsNode,             // Done
     BinaryOperationNode,        // Done
     UnaryOperationNode,         // Done
@@ -36,6 +37,7 @@ const std::unordered_map<NodeType, std::string> node_type_to_str = {
         {NodeType::IdentifierNode,           "IdentifierNode"},
         {NodeType::StringNode,               "StringNode"},
         {NodeType::ListNode,                 "ListNode"},
+        {NodeType::DictNode, "DictNode"},
         {NodeType::StatementsNode,           "StatementsNode"},
         {NodeType::BinaryOperationNode,      "BinaryOperationNode"},
         {NodeType::UnaryOperationNode,       "UnaryOperationNode"},
@@ -100,6 +102,18 @@ struct ListNode : public BaseNode {
 
     explicit ListNode(std::vector<BaseNode *> elements, Position &start_pos, Position &end_pos) : BaseNode() {
         this->type = NodeType::ListNode;
+        this->elements = std::move(elements);
+        this->start_pos = new Position(start_pos);
+        this->end_pos = new Position(end_pos);
+    }
+};
+
+struct DictNode : public BaseNode {
+    std::vector<std::tuple<BaseNode *, BaseNode *>> elements;
+
+    explicit DictNode(std::vector<std::tuple<BaseNode *, BaseNode *>> elements, Position &start_pos, Position &end_pos)
+            : BaseNode() {
+        this->type = NodeType::DictNode;
         this->elements = std::move(elements);
         this->start_pos = new Position(start_pos);
         this->end_pos = new Position(end_pos);

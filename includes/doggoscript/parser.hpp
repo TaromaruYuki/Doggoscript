@@ -89,6 +89,8 @@ class Parser {
 
     ParseResult list_expr();
 
+    ParseResult dict_expr();
+
     ParseResult if_expr();
 
     ParseResult for_expr();

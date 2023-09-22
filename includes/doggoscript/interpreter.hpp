@@ -82,6 +82,8 @@ private:
 
     RuntimeResult visit_ListNode(ListNode *node, Context &context);
 
+    RuntimeResult visit_DictNode(DictNode *node, Context &context);
+
     RuntimeResult visit_IdentifierNode(IdentifierNode *node, Context &context);
 
     RuntimeResult visit_VariableAssignmentNode(VariableAssignmentNode *node, Context &context);

@@ -23,6 +23,8 @@ RuntimeResult Interpreter::visit(BaseNode *node, Context &context) {
             return this->visit_StringNode(static_cast<StringNode *>(node), context);
         case NodeType::ListNode:
             return this->visit_ListNode(static_cast<ListNode *>(node), context);
+        case NodeType::DictNode:
+            return this->visit_DictNode(static_cast<DictNode *>(node), context);
         case NodeType::FunctionDefinitionNode:
             return this->visit_FunctionDefinitionNode(static_cast<FunctionDefinitionNode *>(node), context);
         case NodeType::IdentifierNode:
@@ -639,6 +641,29 @@ RuntimeResult Interpreter::visit_WhileNode(WhileNode *node, Context &context) {
     }
 
     return *result.success(nullptr);
+}
+
+RuntimeResult Interpreter::visit_DictNode(DictNode *node, Context &context) {
+    RuntimeResult result;
+    std::vector<std::tuple<Object *, Object *>> elements;
+
+    for (auto &element: node->elements) {
+        std::optional<Object *> key = result.reg(this->visit(std::get<0>(element), context));
+        if (result.should_return())
+            return result;
+
+        std::optional<Object *> value = result.reg(this->visit(std::get<1>(element), context));
+        if (result.should_return())
+            return result;
+
+        elements.emplace_back(key.value(), value.value());
+    }
+
+    auto *dict = new Dict(elements);
+    dict->set_pos(*node->start_pos, *node->end_pos);
+    dict->set_context(&context);
+
+    return *result.success(dict);
 }
 
 
