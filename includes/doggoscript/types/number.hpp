@@ -4,10 +4,6 @@
 #include "object.hpp"
 #include "boolean.hpp"
 
-struct Number;
-
-typedef std::tuple<std::optional<Number>, std::optional<BaseError>> NumberResult;
-
 struct Number : public Object {
     double value;
 
@@ -25,58 +21,131 @@ struct Number : public Object {
         return this->value != 0;
     }
 
-    NumberResult operator+(const Number &other) const {
-        return {Number(this->value + other.value), std::nullopt};
+    ObjectResult operator+(Object &other) override {
+        if (other.type == ObjectType::Number) {
+            auto *other_number = dynamic_cast<Number *>(&other);
+
+            return {new Number(this->value + other_number->value), std::nullopt};
+        }
+
+        return Object::operator+(other);
     }
 
-    NumberResult operator-(const Number &other) const {
-        return {Number(this->value - other.value), std::nullopt};
+    ObjectResult operator-(Object &other) override {
+        if (other.type == ObjectType::Number) {
+            auto *other_number = dynamic_cast<Number *>(&other);
+
+            return {new Number(this->value - other_number->value), std::nullopt};
+        }
+
+        return Object::operator-(other);
     }
 
-    NumberResult operator*(const Number &other) const {
-        return {Number(this->value * other.value), std::nullopt};
+    ObjectResult operator*(Object &other) override {
+        if (other.type == ObjectType::Number) {
+            auto *other_number = dynamic_cast<Number *>(&other);
+
+            return {new Number(this->value * other_number->value), std::nullopt};
+        }
+
+        return Object::operator*(other);
     }
 
-    NumberResult operator/(const Number &other) const {
-        if (other.value == 0)
-            return {std::nullopt, ArithmeticError(this->start_pos.value(), this->end_pos.value(), "Division by zero")};
+    ObjectResult operator/(Object &other) override {
+        if (other.type == ObjectType::Number) {
+            auto *other_number = dynamic_cast<Number *>(&other);
 
-        return {Number(this->value / other.value), std::nullopt};
+            if (other_number->value == 0)
+                return {std::nullopt,
+                        ArithmeticError(this->start_pos.value(), this->end_pos.value(), "Division by zero")};
+
+            return {new Number(this->value / other_number->value), std::nullopt};
+        }
+
+        return Object::operator/(other);
     }
 
-    BooleanResult operator<(const Number &other) const {
-        return {Boolean(this->value < other.value), std::nullopt};
+    ObjectResult operator<(Object &other) override {
+        if (other.type == ObjectType::Number) {
+            auto *other_number = dynamic_cast<Number *>(&other);
+
+            return {new Boolean(this->value < other_number->value), std::nullopt};
+        }
+
+        return Object::operator<(other);
     }
 
-    BooleanResult operator>(const Number &other) const {
-        return {Boolean(this->value > other.value), std::nullopt};
+    ObjectResult operator>(Object &other) override {
+        if (other.type == ObjectType::Number) {
+            auto *other_number = dynamic_cast<Number *>(&other);
+
+            return {new Boolean(this->value > other_number->value), std::nullopt};
+        }
+
+        return Object::operator>(other);
     }
 
-    BooleanResult operator<=(const Number &other) const {
-        return {Boolean(this->value <= other.value), std::nullopt};
+    ObjectResult operator<=(Object &other) override {
+        if (other.type == ObjectType::Number) {
+            auto *other_number = dynamic_cast<Number *>(&other);
+
+            return {new Boolean(this->value <= other_number->value), std::nullopt};
+        }
+
+        return Object::operator<=(other);
     }
 
-    BooleanResult operator>=(const Number &other) const {
-        return {Boolean(this->value >= other.value), std::nullopt};
+    ObjectResult operator>=(Object &other) override {
+        if (other.type == ObjectType::Number) {
+            auto *other_number = dynamic_cast<Number *>(&other);
+
+            return {new Boolean(this->value >= other_number->value), std::nullopt};
+        }
+
+        return Object::operator>=(other);
     }
 
-    BooleanResult operator==(const Number &other) const {
-        return {Boolean(this->value == other.value), std::nullopt};
+    ObjectResult operator==(Object &other) override {
+        if (other.type == ObjectType::Number) {
+            auto *other_number = dynamic_cast<Number *>(&other);
+
+            return {new Boolean(this->value == other_number->value), std::nullopt};
+        }
+
+        return Object::operator==(other);
     }
 
-    BooleanResult operator!=(const Number &other) const {
-        return {Boolean(this->value != other.value), std::nullopt};
+    ObjectResult operator!=(Object &other) override {
+        if (other.type == ObjectType::Number) {
+            auto *other_number = dynamic_cast<Number *>(&other);
+
+            return {new Boolean(this->value != other_number->value), std::nullopt};
+        }
+
+        return Object::operator!=(other);
     }
 
-    BooleanResult logical_and(const Number &other) const {
-        return {Boolean(this->value && other.value), std::nullopt};
+    ObjectResult logical_and(Object &other) override {
+        if (other.type == ObjectType::Number) {
+            auto *other_number = dynamic_cast<Number *>(&other);
+
+            return {new Boolean(this->value && other_number->value), std::nullopt};
+        }
+
+        return Object::logical_and(other);
     }
 
-    BooleanResult logical_or(const Number &other) const {
-        return {Boolean(this->value || other.value), std::nullopt};
+    ObjectResult logical_or(Object &other) override {
+        if (other.type == ObjectType::Number) {
+            auto *other_number = dynamic_cast<Number *>(&other);
+
+            return {new Boolean(this->value || other_number->value), std::nullopt};
+        }
+
+        return Object::logical_or(other);
     }
 
-    BooleanResult logical_not() const {
-        return {Boolean(!this->value), std::nullopt};
+    ObjectResult logical_not() override {
+        return {new Boolean(this->value), std::nullopt};
     }
 };
