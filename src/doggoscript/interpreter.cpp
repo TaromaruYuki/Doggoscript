@@ -645,7 +645,7 @@ RuntimeResult Interpreter::visit_WhileNode(WhileNode *node, Context &context) {
 
 RuntimeResult Interpreter::visit_DictNode(DictNode *node, Context &context) {
     RuntimeResult result;
-    std::map<Object *, Object *> elements;
+    std::vector<std::tuple<Object *, Object *>> elements;
 
     for (auto &element: node->elements) {
         std::optional<Object *> key = result.reg(this->visit(std::get<0>(element), context));
@@ -656,7 +656,7 @@ RuntimeResult Interpreter::visit_DictNode(DictNode *node, Context &context) {
         if (result.should_return())
             return result;
 
-        elements[key.value()] = value.value();
+        elements.emplace_back(key.value(), value.value());
     }
 
     auto *dict = new Dict(elements);

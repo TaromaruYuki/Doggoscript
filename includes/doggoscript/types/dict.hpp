@@ -1,8 +1,8 @@
 #pragma once
 
 #include <tuple>
+#include <utility>
 #include <vector>
-#include <map>
 #include "object.hpp"
 
 struct Dict;
@@ -10,11 +10,12 @@ struct Dict;
 typedef std::tuple<std::optional<Dict>, std::optional<BaseError>> DictResult;
 
 struct Dict : public Object {
-    std::map<Object *, Object *> elements;
+    std::vector<std::tuple<Object *, Object *>> elements;
 
     Dict() { this->type = ObjectType::List; }
 
-    explicit Dict(std::map<Object *, Object *> elements) : elements(elements) { this->type = ObjectType::Dict; }
+    explicit Dict(std::vector<std::tuple<Object *, Object *>> elements) : elements(
+            std::move(elements)) { this->type = ObjectType::Dict; }
 
     std::string str() {
         std::string s = "{";
