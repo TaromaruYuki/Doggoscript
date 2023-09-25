@@ -104,6 +104,22 @@ ParseResult Parser::statement() {
         this->advance();
 
         return *result.success(new BreakNode(start_pos, this->current_token.value().end_pos.value()));
+    } else if(current_token.is_keyword("incl")) {
+        result.register_advancement();
+        this->advance();
+
+        if(this->current_token.value().type != TokenType::String) {
+            return *result.failure(InvalidSyntaxError(
+                current_token.start_pos.value(), current_token.end_pos.value(),
+                "Expected string"
+            ));
+        }
+
+        Token path = this->current_token.value();
+        result.register_advancement();
+        this->advance();
+
+        return *result.success(new IncludeNode(path, start_pos, this->current_token.value().end_pos.value()));
     }
 
     BaseNode *expr = result.reg(this->expr());

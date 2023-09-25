@@ -1,5 +1,7 @@
 // This is a comment :)
 
+incl "math"
+
 fn join($elements, $seperator) {
     val $result is ""
     val $len is len($elements)
@@ -37,3 +39,6 @@ print("Calculating fibonacci sequence up to 100...")
 val $fib is fibonacci(100)
 
 print(join($fib, " "))
+
+print("10 + 20 is...")
+print(add(10, 20))

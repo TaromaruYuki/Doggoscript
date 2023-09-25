@@ -119,3 +119,9 @@ public:
     TypeError(Position start_pos, Position end_pos, std::string details)
             : BaseError(start_pos, end_pos, "Type Error", details) {}
 };
+
+class FileNotFoundError : public BaseError {
+public:
+    FileNotFoundError(Position start_pos, Position end_pos, std::string details)
+            : BaseError(start_pos, end_pos, "File Not Found", details) {}
+};
