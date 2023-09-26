@@ -258,14 +258,16 @@ struct FunctionDefinitionNode : public BaseNode {
     std::vector<Token *> arg_names;
     BaseNode *body_node;
     bool should_auto_return;
+    bool should_add_to_table;
 
     FunctionDefinitionNode(std::optional<Token> &name, std::vector<Token *> arg_names, BaseNode *body_node,
-                           bool should_auto_return) : BaseNode() {
+                           bool should_auto_return, bool should_add_to_table) : BaseNode() {
         this->type = NodeType::FunctionDefinitionNode;
         this->name = name;
         this->arg_names = std::move(arg_names);
         this->body_node = body_node;
         this->should_auto_return = should_auto_return;
+        this->should_add_to_table = should_add_to_table;
 
         if (this->name.has_value()) {
             this->start_pos = &this->name.value().start_pos.value();

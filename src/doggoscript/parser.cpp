@@ -776,7 +776,7 @@ ParseResult Parser::func_def() {
     this->advance();
 
     return *result.success(new FunctionDefinitionNode(name_token, arg_name_tokens, body,
-                                                      static_cast<StatementsNode *>(body)->statements.size() <= 1));
+                                                      static_cast<StatementsNode *>(body)->statements.size() <= 1, true));
 }
 
 ParseResult Parser::bin_op(const std::function<ParserFunction> &func, std::vector<TokenType> ops,
@@ -916,6 +916,12 @@ ParseResult Parser::class_def() {
 
     BaseNode* body = result.reg(this->statements());
     if(result.should_return()) return result;
+
+    for(BaseNode* statement : static_cast<StatementsNode*>(body)->statements) {
+        if(statement->type == NodeType::FunctionDefinitionNode) {
+            static_cast<FunctionDefinitionNode*>(statement)->should_add_to_table = false;
+        }
+    }
 
     if(this->current_token.value().type != TokenType::RCurly) {
         return *result.failure(InvalidSyntaxError(

@@ -43,6 +43,8 @@ RuntimeResult Interpreter::visit(BaseNode *node, Context &context) {
             return this->visit_ForNode(static_cast<ForNode *>(node), context);
         case NodeType::WhileNode:
             return this->visit_WhileNode(static_cast<WhileNode *>(node), context);
+        case NodeType::ClassDefinitionNode:
+            return this->visit_ClassDefinitionNode(static_cast<ClassDefinitionNode *>(node), context);
         default: {
             std::cerr << "Could not visit node '" << node_type_to_str.at(node->type) << "'" << std::endl;
             exit(EXIT_FAILURE);
@@ -211,10 +213,11 @@ RuntimeResult Interpreter::visit_StatementsNode(StatementsNode *node, Context &c
             return result;
 
         if (reg_res.has_value())
-            values.push_back(reg_res.value());
+            if(reg_res.value() != nullptr)
+                values.push_back(reg_res.value());
     }
 
-    return *result.success(values[values.size() - 1]);
+    return *result.success(new Statements(values));
 }
 
 RuntimeResult Interpreter::visit_VariableAssignmentNode(VariableAssignmentNode *node, Context &context) {
@@ -278,7 +281,7 @@ RuntimeResult Interpreter::visit_FunctionDefinitionNode(FunctionDefinitionNode *
     auto *func = new Function(func_name, node->body_node, arg_names, node->should_auto_return);
     func->set_pos(*node->start_pos, *node->end_pos);
 
-    if (node->name.has_value())
+    if (node->name.has_value() && node->should_add_to_table)
         context.symbol_table->set(func_name, func);
 
     return *result.success(func);
@@ -536,5 +539,19 @@ RuntimeResult Interpreter::visit_DictNode(DictNode *node, Context &context) {
 
     return *result.success(dict);
 }
+
+RuntimeResult Interpreter::visit_ClassDefinitionNode(ClassDefinitionNode *node, Context &context) {
+    RuntimeResult result;
+
+    Statements* body = static_cast<Statements*>(result.reg(this->visit(node->body_node, context)).value());
+    if (result.should_return())
+        return result;
+
+    auto* cls = new Class(node->token->value, body->elements);
+    context.symbol_table->set(node->token->value, cls);
+
+    return *result.success(cls);
+}
+
 
 

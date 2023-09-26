@@ -6,11 +6,10 @@
 
 struct Object;
 
-class SymbolTable {
+struct SymbolTable {
     std::map<std::string, Object *> symbols;
     std::optional<SymbolTable *> parent;
 
-public:
     SymbolTable() {
         this->parent = std::nullopt;
     }
