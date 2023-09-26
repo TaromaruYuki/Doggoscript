@@ -16,11 +16,11 @@
 - [x] Logical Operators
 - [x] Control Statements
 - [x] Comments
-- [ ] Scopes (outside a function)
+- [X] Scopes (outside a function)
 - [ ] Classes
-- [ ] Modules
+- [X] Modules
 - [ ] Error Handling
-- [ ] Maps / Dicts
+- [X] Maps / Dicts
 - [ ] File IO
 - [ ] List Indexing
 - [ ] Assignment Operators
