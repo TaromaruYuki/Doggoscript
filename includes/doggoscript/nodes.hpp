@@ -29,7 +29,7 @@ enum class NodeType {
     ReturnNode,                 // Done
     ContinueNode,               // Done
     BreakNode,                  // Done
-    ClassNode,                  // Not Done
+    ClassDefinitionNode,        // Done
 };
 
 const std::unordered_map<NodeType, std::string> node_type_to_str = {
@@ -53,7 +53,7 @@ const std::unordered_map<NodeType, std::string> node_type_to_str = {
         {NodeType::ReturnNode,               "ReturnNode"},
         {NodeType::ContinueNode,             "ContinueNode"},
         {NodeType::BreakNode,                "BreakNode"},
-        {NodeType::ClassNode,                "ClassNode"},
+        {NodeType::ClassDefinitionNode,      "ClassDefinitionNode"},
 };
 
 struct BaseNode {
@@ -326,7 +326,7 @@ struct ClassDefinitionNode : public BaseNode {
     BaseNode* body_node;
 
     ClassDefinitionNode(Token &class_name, BaseNode* body_node, Position &start_pos, Position &end_pos) : BaseNode() {
-        this->type = NodeType::ClassNode;
+        this->type = NodeType::ClassDefinitionNode;
         this->token = new Token(class_name);
         this->body_node = body_node;
         this->start_pos = new Position(start_pos);

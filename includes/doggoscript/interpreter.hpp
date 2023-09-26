@@ -113,4 +113,6 @@ private:
     RuntimeResult visit_ForNode(ForNode *node, Context &context);
 
     RuntimeResult visit_WhileNode(WhileNode *node, Context &context);
+
+    RuntimeResult visit_ClassDefinitionNode(ClassDefinitionNode *node, Context &context);
 };
