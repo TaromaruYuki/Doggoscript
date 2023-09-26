@@ -21,7 +21,7 @@
 - [X] Modules
 - [ ] Error Handling
 - [X] Maps / Dicts
-- [ ] File IO
+- [X] File IO
 - [ ] List Indexing
 - [ ] Assignment Operators
 
