@@ -135,6 +135,24 @@ ParseResult Parser::expr() {
         result.register_advancement();
         this->advance();
 
+        std::vector<Token> children;
+
+        while(this->current_token.value().type == TokenType::Arrow) {
+            result.register_advancement();
+            this->advance();
+
+            if (this->current_token.value().type != TokenType::Variable) {
+                return *result.failure(InvalidSyntaxError(
+                        current_token.start_pos.value(), current_token.end_pos.value(),
+                        "Expected variable name"
+                ));
+            }
+
+            children.push_back(this->current_token.value());
+            result.register_advancement();
+            this->advance();
+        }
+
         if (!this->current_token.value().is_keyword("is")) {
             return *result.failure(InvalidSyntaxError(
                     current_token.start_pos.value(), current_token.end_pos.value(),
@@ -148,7 +166,7 @@ ParseResult Parser::expr() {
         BaseNode *value = result.reg(this->expr());
         if (result.should_return()) return result;
 
-        return *result.success(new VariableAssignmentNode(variable_token, value));
+        return *result.success(new VariableAssignmentNode(variable_token, children, value));
     }
 
     BaseNode *node = result.reg(
@@ -296,6 +314,24 @@ ParseResult Parser::atom() {
         result.register_advancement();
         this->advance();
 
+        std::vector<Token> children;
+
+        while(this->current_token.has_value() && this->current_token.value().type == TokenType::Arrow) {
+            result.register_advancement();
+            this->advance();
+
+            if (this->current_token.value().type != TokenType::Variable) {
+                return *result.failure(InvalidSyntaxError(
+                        value.start_pos.value(), value.end_pos.value(),
+                        "Expected variable name"
+                ));
+            }
+
+            children.push_back(this->current_token.value());
+            result.register_advancement();
+            this->advance();
+        }
+
         if (this->current_token.has_value() && this->current_token.value().is_keyword("is")) {
             result.register_advancement();
             this->advance();
@@ -303,10 +339,10 @@ ParseResult Parser::atom() {
             BaseNode *expr = result.reg(this->expr());
             if (result.should_return()) return result;
 
-            return *result.success(new VariableReassignmentNode(value, expr));
+            return *result.success(new VariableReassignmentNode(value, children, expr));
         }
 
-        return *result.success(new VariableAccessNode(value));
+        return *result.success(new VariableAccessNode(value, children));
     } else if (value.is_keyword("true") || value.is_keyword("false")) {
         result.register_advancement();
         this->advance();
@@ -357,6 +393,11 @@ ParseResult Parser::atom() {
         if (result.should_return()) return result;
 
         return *result.success(fun_expr);
+    } else if(value.is_keyword("class")) {
+        BaseNode *class_expr = result.reg(this->class_def());
+        if (result.should_return()) return result;
+
+        return *result.success(class_expr);
     }
 
     return *result.failure(InvalidSyntaxError(
@@ -838,58 +879,53 @@ ParseResult Parser::dict_expr() {
     return *result.success(new DictNode(elements, start_pos, this->current_token.value().end_pos.value()));
 }
 
-//ParseResult Parser::factor() {
-//    ParseResult result;
-//    Token token = this->current_token.value();
-//
-//    if(token.type == TokenType::Int || token.type == TokenType::Float) {
-//        this->advance();
-//        auto* node = new NumberNode(token);
-//
-//        return *result.success(node);
-//    } else if(token.type == TokenType::Plus || token.type == TokenType::Minus) {
-//        this->advance();
-//
-//        BaseNode* value = result.reg(this->factor());
-//        if(result.should_return()) return result;
-//
-//        auto* node = new UnaryOperationNode(token, value);
-//
-//        return *result.success(node);
-//    } else if(token.type == TokenType::LParen) {
-//        this->advance();
-//
-//        BaseNode* expr = result.reg(this->expr());
-//        if(result.should_return()) return result;
-//
-//        if(this->current_token.has_value() && this->current_token.value().type == TokenType::RParen) {
-//            this->advance();
-//
-//            return *result.success(expr);
-//        }
-//
-//        return *result.failure(InvalidSyntaxError(
-//            token.start_pos.value(), this->current_token.value().end_pos.value(),
-//            "Expected ')'"
-//        ));
-//    }
-//
-//    return *result.failure(*new InvalidSyntaxError(
-//        token.start_pos.value(), this->current_token.value().end_pos.value(),
-//        "Expected Int or Float"
-//    ));
-//}
-//
-//ParseResult Parser::term() {
-//    std::vector<TokenType> ops({ TokenType::Multiply, TokenType::Divide });
-//    std::function<ParserFunction> func = [this] { return factor(); };
-//    return bin_op(func, ops);
-//}
-//
-//ParseResult Parser::expr() {
-//    std::vector<TokenType> ops({ TokenType::Plus, TokenType::Minus });
-//    std::function<ParserFunction> func = [this] { return term(); };
-//    return bin_op(func, ops);
-//}
-//
+ParseResult Parser::class_def() {
+    ParseResult result;
+    Position start_pos(this->current_token.value().start_pos.value());
 
+    if(!this->current_token.value().is_keyword("class")) {
+        return *result.failure(InvalidSyntaxError(
+            this->current_token.value().start_pos.value(), this->current_token.value().end_pos.value(),
+            "Expected 'class'"
+        ));
+    }
+
+    result.register_advancement();
+    this->advance();
+
+    if(this->current_token.value().type != TokenType::Identifier) {
+        return *result.failure(InvalidSyntaxError(
+            this->current_token.value().start_pos.value(), this->current_token.value().end_pos.value(),
+            "Expected class name"
+        ));
+    }
+
+    Token class_name_token = this->current_token.value();
+    result.register_advancement();
+    this->advance();
+
+    if(this->current_token.value().type != TokenType::LCurly) {
+        return *result.failure(InvalidSyntaxError(
+            this->current_token.value().start_pos.value(), this->current_token.value().end_pos.value(),
+            "Expected '{'"
+        ));
+    }
+
+    result.register_advancement();
+    this->advance();
+
+    BaseNode* body = result.reg(this->statements());
+    if(result.should_return()) return result;
+
+    if(this->current_token.value().type != TokenType::RCurly) {
+        return *result.failure(InvalidSyntaxError(
+            this->current_token.value().start_pos.value(), this->current_token.value().end_pos.value(),
+            "Expected '}'"
+        ));
+    }
+
+    result.register_advancement();
+    this->advance();
+
+    return *result.success(new ClassDefinitionNode(class_name_token, body, start_pos, this->current_token.value().end_pos.value()));
+}

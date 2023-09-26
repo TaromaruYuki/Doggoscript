@@ -1,5 +1,5 @@
 class Test {
-    fn constructor($name, $age) {
+    fn __constructor($name, $age) {
         val $this->$name is $name
         val $this->$age is $age
     }
