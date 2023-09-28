@@ -10,3 +10,4 @@
 #include "class.hpp"
 #include "function.hpp"
 #include "functions/functions.hpp"
+#include "instance.hpp"

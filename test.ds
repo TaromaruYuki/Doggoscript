@@ -1,10 +1,7 @@
 class Test {
-    fn __constructor($name, $age) {
-        val $this->$name is $name
-        val $this->$age is $age
-    }
-
-    fn say_hello() {
-        print("Hello! I am " + $this->$name + " and my age is " + str($this->$age) + "!")
+    fn __constructor() {
+        print("=== Constructor called ===")
     }
 }
+
+val $test is Test()

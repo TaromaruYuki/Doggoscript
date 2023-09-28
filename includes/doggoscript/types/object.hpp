@@ -18,6 +18,7 @@ enum class ObjectType {
     Statements,
     String,
     Class,
+    Instance
 };
 
 const std::unordered_map<ObjectType, std::string> object_type_to_string = {
@@ -29,6 +30,7 @@ const std::unordered_map<ObjectType, std::string> object_type_to_string = {
         {ObjectType::Object,     "object"},
         {ObjectType::Statements, "statements"},
         {ObjectType::String,     "string"},
+        {ObjectType::Instance,   "instance"},
 };
 
 struct Object;

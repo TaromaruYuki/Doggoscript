@@ -42,6 +42,16 @@ struct SymbolTable {
     void remove(const std::string &name) {
         this->symbols.erase(name);
     }
+
+    bool exists(const std::string &name) {
+        if (this->symbols.contains(name))
+            return true;
+
+        if (this->parent.has_value())
+            return this->parent.value()->exists(name);
+
+        return false;
+    }
 };
 
 

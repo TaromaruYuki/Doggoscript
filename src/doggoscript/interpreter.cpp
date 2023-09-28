@@ -297,6 +297,14 @@ RuntimeResult Interpreter::visit_IdentifierNode(IdentifierNode *node, Context &c
                 "Function '" + node->token->value + "' is not defined"
         ));
 
+    if(value->type == ObjectType::Class) {
+        auto *class_copy = new Class(*static_cast<Class*>(value));
+        class_copy->set_context(&context);
+        class_copy->set_pos(*node->start_pos, *node->end_pos);
+
+        return *result.success(class_copy);
+    }
+
     auto *func = static_cast<BaseFunction *>(value);
 
     if (func->func_type == FunctionType::UserDefined) {
@@ -331,11 +339,33 @@ RuntimeResult Interpreter::visit_CallNode(CallNode *node, Context &context) {
         args.push_back(arg_value.value());
     }
 
-    if (func_o->type != ObjectType::Function)
+    if (func_o->type != ObjectType::Function && func_o->type != ObjectType::Class)
         return *result.failure(IllegalOperationError(
                 *node->start_pos, *node->end_pos,
-                "Expected function"
+                "Expected function or class"
         ));
+
+    if(func_o->type == ObjectType::Class) {
+        auto* cls = static_cast<Class*>(func_o);
+        auto* instance = new Instance(cls);
+        instance->set_context(&context);
+        instance->set_pos(*node->start_pos, *node->end_pos);
+
+        if(!instance->item_exists("__constructor") && !args.empty())
+            return *result.failure(ArgumentError(
+                    *node->start_pos, *node->end_pos,
+                    "Class '" + cls->name + "' does not have a constructor, so it takes no arguments"
+            ));
+
+        if(instance->item_exists("__constructor")) {
+            result.reg(instance->construct(args));
+
+            if (result.should_return())
+                return result;
+        }
+
+        return *result.success(instance);
+    }
 
     auto *func = static_cast<BaseFunction *>(func_o);
     std::optional<Object *> return_value = result.reg((*func)(args));
