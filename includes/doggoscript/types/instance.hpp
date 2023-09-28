@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iomanip>
 #include "object.hpp"
 #include "class.hpp"
 
@@ -13,7 +14,10 @@ struct Instance : public Object {
     }
 
     std::string str() override {
-        return "<instance of " + this->cls->name + ">";
+        std::stringstream str;
+        str << "<" << this->cls->name << " at address 0x" << std::hex << std::setw(sizeof(size_t)) << std::setfill('0') << this << ">";
+
+        return str.str();
     }
 
     [[nodiscard]] bool item_exists(std::string item) const {

@@ -2,6 +2,10 @@ class Test {
     fn __constructor() {
         print("=== Constructor called ===")
     }
+
+    fn hello() {
+        print("Hello, world!")
+    }
 }
 
 val $test is Test()
