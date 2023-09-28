@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.26)
 project(Doggoscript VERSION 0.1.0)
 
+set("IS_DEBUG" 0)
+
+if (CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    set("IS_DEBUG" 1)
+endif ()
+
+message("Debug mode: ${IS_DEBUG}")
+
 set(CMAKE_CXX_STANDARD 20)
 configure_file(DoggoscriptConfig.hpp.in includes/config/DoggoscriptConfig.h)
 

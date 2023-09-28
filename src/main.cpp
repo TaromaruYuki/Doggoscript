@@ -51,9 +51,13 @@ int main(int argc, char **argv) {
     std::string src((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
     file.close();
 
+#if DOGGOSCRIPT_DEBUG
     auto start = std::chrono::high_resolution_clock::now();
     DoggoscriptResult result = run(src, symbol_table);
     auto end = std::chrono::high_resolution_clock::now();
+#else
+    DoggoscriptResult result = run(src, symbol_table);
+#endif
 
     if (result.error.has_value()) {
         std::cout << result.error.value().str() << std::endl;
@@ -63,9 +67,10 @@ int main(int argc, char **argv) {
     if (result.result.has_value())
         std::cout << result.result.value()->str() << std::endl;
 
+#if DOGGOSCRIPT_DEBUG
     std::chrono::duration<double, std::milli> ms_double = end - start;
-
     std::cout << "Execution time: " << ms_double.count() << "ms" << std::endl;
+#endif
 
     return 0;
 }
