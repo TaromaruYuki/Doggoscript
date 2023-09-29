@@ -28,6 +28,13 @@ struct SymbolTable {
         return nullptr;
     }
 
+    Object* get_local(const std::string &name) {
+        if(this->symbols.contains(name))
+            return this->symbols[name];
+
+        return nullptr;
+    }
+
     void set(std::string name, Object *value) {
         if (this->parent.has_value()) {
             if (this->parent.value()->get(name) != nullptr) {
@@ -36,6 +43,10 @@ struct SymbolTable {
             }
         }
 
+        this->symbols[name] = value;
+    }
+
+    void set_local(std::string name, Object *value) {
         this->symbols[name] = value;
     }
 
@@ -51,6 +62,10 @@ struct SymbolTable {
             return this->parent.value()->exists(name);
 
         return false;
+    }
+
+    bool exists_local(const std::string &name) {
+        return this->symbols.contains(name);
     }
 };
 

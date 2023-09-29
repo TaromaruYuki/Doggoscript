@@ -11,6 +11,13 @@ struct Instance : public Object {
     explicit Instance(BaseClass* cls) : cls(cls) {
         this->type = ObjectType::Instance;
         this->symbol_table = new SymbolTable(cls->symbol_table);
+        this->symbol_table->set("$this", this);
+
+        for(auto& [key, value] : cls->symbol_table->symbols) {
+            if(value->type == ObjectType::Function) {
+                this->symbol_table->set_local(key, value);
+            }
+        }
     }
 
     std::string str() override {
@@ -27,9 +34,13 @@ struct Instance : public Object {
     RuntimeResult construct(std::vector<Object*> args) {
         RuntimeResult result;
 
+        auto* context = new Context("<constructor>");
+        context->symbol_table = this->symbol_table;
+        context->parent = this->context;
+
         if(this->cls->symbol_table->exists("__constructor")) {
             auto* func_o = static_cast<BaseFunction*>(this->cls->symbol_table->get("__constructor"));
-            func_o->set_context(this->context);
+            func_o->set_context(context);
 
             if(func_o->func_type == FunctionType::UserDefined) {
                 auto* func = static_cast<Function*>(func_o);

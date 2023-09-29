@@ -320,10 +320,10 @@ ParseResult Parser::atom() {
             result.register_advancement();
             this->advance();
 
-            if (this->current_token.value().type != TokenType::Variable) {
+            if (this->current_token.value().type != TokenType::Variable && this->current_token.value().type != TokenType::Identifier) {
                 return *result.failure(InvalidSyntaxError(
                         value.start_pos.value(), value.end_pos.value(),
-                        "Expected variable name"
+                        "Expected variable name or function name"
                 ));
             }
 

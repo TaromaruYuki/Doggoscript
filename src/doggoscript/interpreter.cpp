@@ -227,6 +227,48 @@ RuntimeResult Interpreter::visit_VariableAssignmentNode(VariableAssignmentNode *
     if (result.should_return())
         return result;
 
+    if(!node->children.empty()) {
+        Object* parent = context.symbol_table->get(node->token->value);
+
+        if(parent == nullptr)
+            return *result.failure(NameError(
+                *node->start_pos, *node->end_pos,
+                "Variable '" + node->token->value + "' is not defined"
+            ));
+
+        if(parent->type != ObjectType::Instance)
+            return *result.failure(IllegalOperationError(
+                *node->start_pos, *node->end_pos,
+                "Cannot access member of non-instance"
+            ));
+
+        Instance* instance = static_cast<Instance*>(parent);
+        Instance* prev = nullptr;
+        Token* name;
+
+        for(size_t i = 0; i < node->children.size(); i++) {
+            name = &node->children[i];
+
+            if(instance->type != ObjectType::Instance)
+                return *result.failure(IllegalOperationError(
+                    *node->start_pos, *node->end_pos,
+                    "Cannot access member of non-instance"
+                ));
+
+            prev = instance;
+            instance = instance->symbol_table->exists_local(name->value) ? static_cast<Instance*>(instance->symbol_table->get_local(name->value)) : nullptr;
+
+            if(instance == nullptr && i != node->children.size() - 1)
+                return *result.failure(NameError(
+                    *node->start_pos, *node->end_pos,
+                    "Variable '" + name->value + "' is not defined"
+                ));
+        }
+
+        prev->symbol_table->set(name->value, value.value());
+        return *result.success(value.value());
+    }
+
     context.symbol_table->set(node->token->value, value.value());
     value.value()->set_pos(*node->start_pos, *node->end_pos);
     value.value()->set_context(&context);
@@ -244,6 +286,39 @@ RuntimeResult Interpreter::visit_VariableAccessNode(VariableAccessNode *node, Co
                 *node->start_pos, *node->end_pos,
                 "Variable '" + var_name + "' is not defined"
         ));
+
+    if(!node->children.empty()) {
+        auto* instance = static_cast<Instance*>(value);
+
+        auto* new_context = new Context(instance->cls->name);
+        new_context->parent = &context;
+        new_context->symbol_table = instance->symbol_table;
+
+        Token* name;
+
+        for(size_t i = 0; i < node->children.size(); i++) {
+            name = &node->children[i];
+
+            if(instance->type != ObjectType::Instance)
+                return *result.failure(IllegalOperationError(
+                        *node->start_pos, *node->end_pos,
+                        "Cannot access member of non-instance"
+                ));
+
+            instance = instance->symbol_table->exists_local(name->value) ? static_cast<Instance*>(instance->symbol_table->get_local(name->value)) : nullptr;
+
+            if(instance == nullptr && i != node->children.size() - 1)
+                return *result.failure(NameError(
+                        *node->start_pos, *node->end_pos,
+                        "Variable '" + name->value + "' is not defined"
+                ));
+        }
+
+        instance->set_pos(*node->start_pos, *node->end_pos);
+        instance->set_context(new_context);
+
+        return *result.success(instance);
+    }
 
     value->set_pos(*node->start_pos, *node->end_pos);
     value->set_context(&context);
@@ -264,6 +339,48 @@ RuntimeResult Interpreter::visit_VariableReassignmentNode(VariableReassignmentNo
                 *node->start_pos, *node->end_pos,
                 "Variable '" + var_name + "' is not defined"
         ));
+
+    if(!node->children.empty()) {
+        Object* parent = context.symbol_table->get(node->token->value);
+
+        if(parent->type != ObjectType::Instance)
+            return *result.failure(IllegalOperationError(
+                    *node->start_pos, *node->end_pos,
+                    "Cannot access member of non-instance"
+            ));
+
+        auto* instance = static_cast<Instance*>(parent);
+        Instance* prev = nullptr;
+        Token* name;
+
+        for(size_t i = 0; i < node->children.size(); i++) {
+            name = &node->children[i];
+
+            if(instance->type != ObjectType::Instance)
+                return *result.failure(IllegalOperationError(
+                        *node->start_pos, *node->end_pos,
+                        "Cannot access member of non-instance"
+                ));
+
+            prev = instance;
+            instance = instance->symbol_table->exists_local(name->value) ? static_cast<Instance*>(instance->symbol_table->get_local(name->value)) : nullptr;
+
+            if(instance == nullptr && i != node->children.size() - 1)
+                return *result.failure(NameError(
+                        *node->start_pos, *node->end_pos,
+                        "Variable '" + name->value + "' is not defined"
+                ));
+        }
+
+        if (prev->symbol_table->get(var_name) == nullptr)
+            return *result.failure(NameError(
+                    *node->start_pos, *node->end_pos,
+                    "Variable '" + var_name + "' is not defined"
+            ));
+
+        prev->symbol_table->set(name->value, value.value());
+        return *result.success(value.value());
+    }
 
     context.symbol_table->set(var_name, value.value());
 
@@ -578,6 +695,8 @@ RuntimeResult Interpreter::visit_ClassDefinitionNode(ClassDefinitionNode *node, 
         return result;
 
     auto* cls = new Class(node->token->value, body->elements);
+    cls->set_context(&context);
+    cls->symbol_table->parent = context.symbol_table;
     context.symbol_table->set(node->token->value, cls);
 
     return *result.success(cls);
