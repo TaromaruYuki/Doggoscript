@@ -4,9 +4,19 @@
 #include "function.hpp"
 #include "../context.hpp"
 
+enum class BuiltInType {
+    UserCreated,
+    String,
+    Number,
+    Boolean,
+    List,
+    Dict
+};
+
 struct BaseClass : public Object {
     std::string name;
     SymbolTable *symbol_table;
+    BuiltInType cls_type;
 
     explicit BaseClass(std::string name) : name(std::move(name)) {
         this->type = ObjectType::Class;
@@ -22,6 +32,8 @@ struct Class : public BaseClass {
     std::vector<Object*> methods;
 
     Class(std::string name, std::vector<Object*> methods) : BaseClass(std::move(name)), methods(methods) {
+        this->cls_type = BuiltInType::UserCreated;
+
         for(Object* method : methods) {
             if(method->type == ObjectType::Function) {
                 auto* func = static_cast<BaseFunction*>(method);
@@ -29,4 +41,10 @@ struct Class : public BaseClass {
             }
         }
     }
+};
+
+struct BuiltInClass : public BaseClass {
+    BuiltInClass(std::string name) : BaseClass(std::move(name)) { }
+
+    virtual std::optional<std::string> to_string() { return std::nullopt; }
 };

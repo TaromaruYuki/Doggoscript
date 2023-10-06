@@ -10,4 +10,5 @@
 #include "class.hpp"
 #include "function.hpp"
 #include "functions/functions.hpp"
+#include "classes/classes.hpp"
 #include "instance.hpp"

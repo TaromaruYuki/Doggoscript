@@ -21,6 +21,28 @@ struct Instance : public Object {
     }
 
     std::string str() override {
+        if(this->cls->cls_type != BuiltInType::UserCreated) {
+            BuiltInClass* cls = static_cast<BuiltInClass*>(this->cls);
+            if(std::optional<std::string> str = cls->to_string()) {
+                return str.value();
+            }
+        } else {
+            if(this->item_exists("__string")) {
+                auto* func_o = static_cast<BaseFunction*>(this->symbol_table->get("__string"));
+                func_o->set_context(this->context);
+
+                if(func_o->func_type == FunctionType::UserDefined) {
+                    auto* func = static_cast<Function*>(func_o);
+                    auto result = func->operator()({});
+
+                    if(result.error.has_value())
+                        return "<error>";
+
+                    return result.value.value()->print_friendly();
+                }
+            }
+        }
+
         std::stringstream str;
         str << "<" << this->cls->name << " at address 0x" << std::hex << std::setw(sizeof(size_t)) << std::setfill('0') << this << ">";
 

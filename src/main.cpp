@@ -64,8 +64,8 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    if (result.result.has_value())
-        std::cout << result.result.value()->str() << std::endl;
+//    if (result.result.has_value())
+//        std::cout << result.result.value()->str() << std::endl;
 
 #if DOGGOSCRIPT_DEBUG
     std::chrono::duration<double, std::milli> ms_double = end - start;

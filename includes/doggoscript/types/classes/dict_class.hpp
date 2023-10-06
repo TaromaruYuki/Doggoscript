@@ -1,21 +1,17 @@
 #pragma once
 
-#include <tuple>
-#include <utility>
-#include <vector>
-#include "object.hpp"
+#include "../class.hpp"
 
-struct Dict;
+struct Instance; // From doggoscript/types/instance.hpp
 
-struct Dict : public Object {
+struct DictClass : public BuiltInClass {
     std::vector<std::tuple<Object *, Object *>> elements;
 
-    Dict() { this->type = ObjectType::Dict; }
+    static Instance *new_instance(std::vector<std::tuple<Object *, Object *>> initial_value);
 
-    explicit Dict(std::vector<std::tuple<Object *, Object *>> elements) : elements(
-            std::move(elements)) { this->type = ObjectType::Dict; }
+    explicit DictClass(std::vector<std::tuple<Object *, Object *>> initial_value);
 
-    std::string str() {
+    std::optional<std::string> to_string() override {
         std::string s = "{";
 
         for (size_t i = 0; i < this->elements.size(); i++) {
@@ -30,9 +26,5 @@ struct Dict : public Object {
         s += "}";
 
         return s;
-    }
-
-    bool is_true() override {
-        return !this->elements.empty();
     }
 };

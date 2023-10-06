@@ -17,6 +17,11 @@ add_executable(${PROJECT_NAME} src/main.cpp
         src/doggoscript/parser.cpp
         src/doggoscript/doggoscript.cpp
         src/doggoscript/interpreter.cpp
-        src/doggoscript/token.cpp)
+        src/doggoscript/token.cpp
+        src/doggoscript/types/classes/number_class.cpp
+        src/doggoscript/types/classes/string_class.cpp
+        src/doggoscript/types/classes/list_class.cpp
+        src/doggoscript/types/classes/dict_class.cpp
+        src/doggoscript/types/classes/boolean_class.cpp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_BINARY_DIR}/includes)

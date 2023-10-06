@@ -53,25 +53,31 @@ RuntimeResult Interpreter::visit(BaseNode *node, Context &context) {
 }
 
 RuntimeResult Interpreter::visit_NumberNode(NumberNode *node, Context &context) {
-    auto *number = new Number(node->token->value);
-    number->set_pos(*node->start_pos, *node->end_pos);
-    number->set_context(&context);
+    auto *number_cls = new NumberClass(std::stod(node->token->value));
+    number_cls->set_pos(*node->start_pos, *node->end_pos);
+    number_cls->set_context(&context);
+
+    auto *number = new Instance(number_cls);
 
     return *RuntimeResult().success(number);
 }
 
 RuntimeResult Interpreter::visit_BooleanNode(BooleanNode *node, Context &context) {
-    auto *boolean = new Boolean(node->token->value);
-    boolean->set_pos(*node->start_pos, *node->end_pos);
-    boolean->set_context(&context);
+    auto *boolean_cls = new BooleanClass(node->token->value == "true");
+    boolean_cls->set_pos(*node->start_pos, *node->end_pos);
+    boolean_cls->set_context(&context);
+
+    auto *boolean = new Instance(boolean_cls);
 
     return *RuntimeResult().success(boolean);
 }
 
 RuntimeResult Interpreter::visit_StringNode(StringNode *node, Context &context) {
-    auto *string = new String(node->token->value);
-    string->set_pos(*node->start_pos, *node->end_pos);
-    string->set_context(&context);
+    auto *string_cls = new StringClass(node->token->value);
+    string_cls->set_pos(*node->start_pos, *node->end_pos);
+    string_cls->set_context(&context);
+
+    auto *string = new Instance(string_cls);
 
     return *RuntimeResult().success(string);
 }
@@ -90,9 +96,15 @@ RuntimeResult Interpreter::visit_ListNode(ListNode *node, Context &context) {
             elements.push_back(reg_res.value());
     }
 
-    auto *list = new List(elements);
-    list->set_pos(*node->start_pos, *node->end_pos);
-    list->set_context(&context);
+//    auto *list = new List(elements);
+//    list->set_pos(*node->start_pos, *node->end_pos);
+//    list->set_context(&context);
+
+    auto *list_cls = new ListClass(elements);
+    list_cls->set_pos(*node->start_pos, *node->end_pos);
+    list_cls->set_context(&context);
+
+    auto *list = new Instance(list_cls);
 
     return *result.success(list);
 }
@@ -680,9 +692,15 @@ RuntimeResult Interpreter::visit_DictNode(DictNode *node, Context &context) {
         elements.emplace_back(key.value(), value.value());
     }
 
-    auto *dict = new Dict(elements);
-    dict->set_pos(*node->start_pos, *node->end_pos);
-    dict->set_context(&context);
+//    auto *dict = new Dict(elements);
+//    dict->set_pos(*node->start_pos, *node->end_pos);
+//    dict->set_context(&context);
+
+    auto *dict_cls = new DictClass(elements);
+    dict_cls->set_pos(*node->start_pos, *node->end_pos);
+    dict_cls->set_context(&context);
+
+    auto *dict = new Instance(dict_cls);
 
     return *result.success(dict);
 }

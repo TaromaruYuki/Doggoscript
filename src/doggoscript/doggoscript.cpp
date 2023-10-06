@@ -45,4 +45,5 @@ void populate_symbol_table(SymbolTable *symbol_table) {
     symbol_table->set("str", new StrFunction());
     symbol_table->set("dict_get", new DictGetFunction());
     symbol_table->set("dict_set", new DictSetFunction());
+//    symbol_table->set("String", new StringClass());
 }
