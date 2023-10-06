@@ -96,10 +96,6 @@ RuntimeResult Interpreter::visit_ListNode(ListNode *node, Context &context) {
             elements.push_back(reg_res.value());
     }
 
-//    auto *list = new List(elements);
-//    list->set_pos(*node->start_pos, *node->end_pos);
-//    list->set_context(&context);
-
     auto *list_cls = new ListClass(elements);
     list_cls->set_pos(*node->start_pos, *node->end_pos);
     list_cls->set_context(&context);
@@ -109,6 +105,7 @@ RuntimeResult Interpreter::visit_ListNode(ListNode *node, Context &context) {
     return *result.success(list);
 }
 
+// FIXME: New type system
 RuntimeResult Interpreter::visit_BinaryOperationNode(BinaryOperationNode *node, Context &context) {
     RuntimeResult result;
 
@@ -185,6 +182,7 @@ RuntimeResult Interpreter::visit_BinaryOperationNode(BinaryOperationNode *node, 
     return *result.success(obj);
 }
 
+// FIXME: Possibly needs fixed with new type system?
 RuntimeResult Interpreter::visit_UnaryOperationNode(UnaryOperationNode *node, Context &context) {
     RuntimeResult result;
     std::optional<Object *> obj_res = result.reg(this->visit(node->value, context));
@@ -194,9 +192,9 @@ RuntimeResult Interpreter::visit_UnaryOperationNode(UnaryOperationNode *node, Co
     Object *obj = obj_res.value();
 
     if (node->token->type == TokenType::Minus) {
-        Number neg_1 = Number(-1);
-        neg_1.set_context(&context);
-        ObjectResult res = *obj * neg_1;
+        Instance* neg_1 = NumberClass::new_instance(-1);
+        neg_1->set_context(&context);
+        ObjectResult res = *obj * *neg_1;
 
         if (std::get<1>(res).has_value())
             return *result.failure(std::get<1>(res).value());
@@ -574,6 +572,7 @@ RuntimeResult Interpreter::visit_IfNode(IfNode *node, Context &context) {
     return *result.success(nullptr);
 }
 
+// FIXME: New type system
 RuntimeResult Interpreter::visit_ForNode(ForNode *node, Context &context) {
     RuntimeResult result;
     Context for_context("");
@@ -595,7 +594,7 @@ RuntimeResult Interpreter::visit_ForNode(ForNode *node, Context &context) {
         if (result.should_return())
             return result;
     } else {
-        step_value_o = new Number(1);
+        step_value_o = NumberClass::new_instance(1);
     }
 
     if (start_value_o.value()->type != ObjectType::Number)
@@ -692,10 +691,6 @@ RuntimeResult Interpreter::visit_DictNode(DictNode *node, Context &context) {
         elements.emplace_back(key.value(), value.value());
     }
 
-//    auto *dict = new Dict(elements);
-//    dict->set_pos(*node->start_pos, *node->end_pos);
-//    dict->set_context(&context);
-
     auto *dict_cls = new DictClass(elements);
     dict_cls->set_pos(*node->start_pos, *node->end_pos);
     dict_cls->set_context(&context);
@@ -719,6 +714,3 @@ RuntimeResult Interpreter::visit_ClassDefinitionNode(ClassDefinitionNode *node, 
 
     return *result.success(cls);
 }
-
-
-

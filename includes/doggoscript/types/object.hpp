@@ -9,27 +9,17 @@
 
 
 enum class ObjectType {
-    Boolean,
     Function,
-    List,
-    Dict,
-    Number,
     Object,
     Statements,
-    String,
     Class,
     Instance
 };
 
 const std::unordered_map<ObjectType, std::string> object_type_to_string = {
-        {ObjectType::Boolean,    "boolean"},
         {ObjectType::Function,   "function"},
-        {ObjectType::List,       "list"},
-        {ObjectType::Dict,       "dict"},
-        {ObjectType::Number,     "number"},
         {ObjectType::Object,     "object"},
         {ObjectType::Statements, "statements"},
-        {ObjectType::String,     "string"},
         {ObjectType::Instance,   "instance"},
 };
 
