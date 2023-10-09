@@ -5,8 +5,6 @@
 #include "../../../../includes/doggoscript/types/instance.hpp"
 #include "../../../../includes/doggoscript/types/classes/number_class.hpp"
 
-#include "../../../../includes/doggoscript/types/string.hpp"
-
 Instance *StringClass::new_instance(std::string initial_value) {
     auto* str_cls = new StringClass(initial_value);
     auto* instance = new Instance(str_cls);
