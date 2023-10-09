@@ -572,52 +572,33 @@ RuntimeResult Interpreter::visit_IfNode(IfNode *node, Context &context) {
     return *result.success(nullptr);
 }
 
-// FIXME: New type system
 RuntimeResult Interpreter::visit_ForNode(ForNode *node, Context &context) {
     RuntimeResult result;
     Context for_context("");
     auto *for_symbol_table = new SymbolTable(context.symbol_table);
     for_context.symbol_table = for_symbol_table;
 
-    std::optional<Object *> start_value_o = result.reg(this->visit(node->start_value, for_context));
-    if (result.should_return())
+    std::optional<Object *> start_obj = result.reg(this->visit(node->start_value, for_context));
+    if(result.should_return())
         return result;
 
-    std::optional<Object *> end_value_o = result.reg(this->visit(node->end_value, for_context));
-    if (result.should_return())
+    std::optional<Object *> end_obj = result.reg(this->visit(node->end_value, for_context));
+    if(result.should_return())
         return result;
 
-    std::optional<Object *> step_value_o;
+    std::optional<Object *> step_obj;
 
-    if (node->step_value != nullptr) {
-        step_value_o = result.reg(this->visit(node->step_value, for_context));
-        if (result.should_return())
+    if(node->step_value != nullptr) {
+        step_obj = result.reg(this->visit(node->step_value, for_context));
+        if(result.should_return())
             return result;
     } else {
-        step_value_o = NumberClass::new_instance(1);
+        step_obj = NumberClass::new_instance(1);
     }
 
-    if (start_value_o.value()->type != ObjectType::Number)
-        return *result.failure(IllegalOperationError(
-                *node->start_pos, *node->end_pos,
-                "Expected number for start value"
-        ));
-
-    if (end_value_o.value()->type != ObjectType::Number)
-        return *result.failure(IllegalOperationError(
-                *node->start_pos, *node->end_pos,
-                "Expected number for end value"
-        ));
-
-    if (step_value_o.value()->type != ObjectType::Number)
-        return *result.failure(IllegalOperationError(
-                *node->start_pos, *node->end_pos,
-                "Expected number for step value"
-        ));
-
-    auto *start_value = static_cast<Number *>(start_value_o.value());
-    auto *end_value = static_cast<Number *>(end_value_o.value());
-    auto *step_value = static_cast<Number *>(step_value_o.value());
+    auto* start_value = static_cast<NumberClass*>(static_cast<Instance*>(start_obj.value())->cls);
+    auto* end_value = static_cast<NumberClass*>(static_cast<Instance*>(end_obj.value())->cls);
+    auto* step_value = static_cast<NumberClass*>(static_cast<Instance*>(step_obj.value())->cls);
 
     double i = start_value->value;
 
@@ -630,7 +611,7 @@ RuntimeResult Interpreter::visit_ForNode(ForNode *node, Context &context) {
     }
 
     while (cond(i, end_value->value)) {
-        for_symbol_table->set(node->token->value, new Number(i));
+        for_symbol_table->set(node->token->value, NumberClass::new_instance(i));
         i += step_value->value;
 
         std::optional<Object *> value = result.reg(this->visit(node->body, for_context));
