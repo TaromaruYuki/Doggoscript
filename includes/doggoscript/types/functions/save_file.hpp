@@ -27,7 +27,7 @@ struct SaveFileFunction : public BuiltInFunction {
             return *result.failure(BaseError(
                     *args[0]->start_pos, *args[0]->end_pos,
                     "File Error",
-                    std::format("File '{}' has threw a error. File may be invalid.", file_name->value)
+                    "File '" + file_name->value + "' has threw a error. File may be invalid."
             ));
         }
 

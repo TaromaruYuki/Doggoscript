@@ -700,11 +700,11 @@ RuntimeResult Interpreter::visit_ClassDefinitionNode(ClassDefinitionNode *node, 
 RuntimeResult Interpreter::visit_IncludeNode(IncludeNode *node, Context &context) {
     RuntimeResult result;
 
-    std::fstream file(std::format("{}.ds", node->path), std::ios::in);
+    std::fstream file(node->path + ".ds", std::ios::in);
     if (!file.is_open())
         return *result.failure(FileNotFoundError(
                 *node->start_pos, *node->end_pos,
-                std::format("{}.ds", node->path)
+                node->path + ".ds"
         ));
 
     std::string code;

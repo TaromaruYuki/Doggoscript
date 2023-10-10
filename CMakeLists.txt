@@ -9,6 +9,9 @@ endif ()
 
 message("Debug mode: ${IS_DEBUG}")
 
+include(CheckIncludeFileCXX)
+check_include_file_cxx("format" HAVE_FORMAT)
+
 set(CMAKE_CXX_STANDARD 20)
 configure_file(DoggoscriptConfig.hpp.in includes/config/DoggoscriptConfig.h)
 

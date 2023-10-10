@@ -1,6 +1,5 @@
 #include "../../../../includes/doggoscript/types/classes/dict_class.hpp"
 
-#include <format>
 #include "../../../../includes/doggoscript/types/instance.hpp"
 #include "../../../../includes/doggoscript/types/classes/string_class.hpp"
 

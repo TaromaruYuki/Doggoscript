@@ -1,7 +1,14 @@
 #pragma once
 
+#include <config/DoggoscriptConfig.h>
 #include <string>
+
+#ifdef HAVE_FORMAT
 #include <format>
+#else
+#include <sstream>
+#endif
+
 #include "position.hpp"
 
 class BaseError {
@@ -61,6 +68,7 @@ public:
     }
 
     std::string str() {
+#ifdef HAVE_FORMAT
         return std::format(
                 "{}: {}\nFile {}, line {}\n\n{}",
                 this->error_name,
@@ -69,25 +77,32 @@ public:
                 this->start_pos.line_number + 1,
                 this->string_with_arrows()
         );
+#else
+        std::stringstream format;
+        format << this->error_name << ": " << this->details << "\nFile " << this->start_pos.file_name << ", line "
+               << this->start_pos.line_number + 1 << "\n\n" << this->string_with_arrows();
+
+        return format.str();
+#endif
     }
 };
 
 class IllegalCharacterError : public BaseError {
 public:
     IllegalCharacterError(Position start_pos, Position end_pos, char character)
-            : BaseError(start_pos, end_pos, "Illegal Character", std::format("'{}'", character)) {}
+            : BaseError(start_pos, end_pos, "Illegal Character", "'" + std::to_string(character) + "'") {}
 };
 
 class ExpectedCharacterError : public BaseError {
 public:
     ExpectedCharacterError(Position start_pos, Position end_pos, char character)
-            : BaseError(start_pos, end_pos, "Expected Character", std::format("'{}'", character)) {}
+            : BaseError(start_pos, end_pos, "Expected Character", "'" + std::to_string(character) + "'") {}
 };
 
 class InvalidSyntaxError : public BaseError {
 public:
     InvalidSyntaxError(Position start_pos, Position end_pos, std::string details)
-            : BaseError(start_pos, end_pos, "Invaid Syntax", details) {}
+            : BaseError(start_pos, end_pos, "Invalid Syntax", details) {}
 };
 
 class ArithmeticError : public BaseError {

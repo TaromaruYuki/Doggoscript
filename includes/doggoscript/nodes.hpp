@@ -1,7 +1,12 @@
 #pragma once
 
+#include <config/DoggoscriptConfig.h>
 #include <string>
+
+#ifdef HAVE_FORMAT
 #include <format>
+#endif
+
 #include <utility>
 #include <variant>
 #include <unordered_map>

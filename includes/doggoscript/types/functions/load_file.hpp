@@ -25,7 +25,7 @@ struct LoadFileFunction : public BuiltInFunction {
         if (!file) {
             return *result.failure(FileNotFoundError(
                 *args[0]->start_pos, *args[0]->end_pos,
-                std::format("File '{}'", file_name->value)
+                "File '" + file_name->value + "'"
             ));
         }
 

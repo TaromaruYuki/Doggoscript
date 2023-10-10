@@ -15,7 +15,7 @@ struct NumberClass : public BuiltInClass {
     explicit NumberClass(double initial_value);
 
     std::optional<std::string> to_string() override {
-        return std::format("{}", this->value);
+        return std::to_string(this->value);
     }
 
     bool is_true() override {

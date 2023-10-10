@@ -1,11 +1,17 @@
 #pragma once
 
+#include <config/DoggoscriptConfig.h>
 #include <string>
 #include <sstream>
+
+#ifdef HAVE_FORMAT
 #include <format>
+#endif
+
 #include <utility>
 #include <optional>
 #include <unordered_map>
+#include <vector>
 
 #include "position.hpp"
 
