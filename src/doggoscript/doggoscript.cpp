@@ -37,14 +37,4 @@ DoggoscriptResult run(std::string src, SymbolTable *symbol_table) {
 void populate_symbol_table(SymbolTable *symbol_table) {
     symbol_table->set("print", new PrintFunction());
     symbol_table->set("input", new InputFunction());
-    symbol_table->set("append", new AppendFunction());
-    symbol_table->set("pop", new PopFunction());
-    symbol_table->set("extend", new ExtendFunction());
-    symbol_table->set("get", new GetFunction());
-    symbol_table->set("len", new LenFunction());
-    symbol_table->set("str", new StrFunction());
-    symbol_table->set("dict_get", new DictGetFunction());
-    symbol_table->set("dict_set", new DictSetFunction());
-    symbol_table->set("load_file", new LoadFileFunction());
-    symbol_table->set("save_file", new SaveFileFunction());
 }

@@ -115,5 +115,7 @@ private:
 
     RuntimeResult visit_WhileNode(WhileNode *node, Context &context);
 
+    RuntimeResult visit_ClassDefinitionNode(ClassDefinitionNode *node, Context &context);
+
     RuntimeResult visit_IncludeNode(IncludeNode *node, Context &context);
 };

@@ -1,10 +1,9 @@
 #pragma once
 
 #include "object.hpp"
-#include "number.hpp"
-#include "boolean.hpp"
-#include "string.hpp"
-#include "list.hpp"
-#include "dict.hpp"
+#include "statements.hpp"
+#include "class.hpp"
 #include "function.hpp"
 #include "functions/functions.hpp"
+#include "classes/classes.hpp"
+#include "instance.hpp"

@@ -6,11 +6,10 @@
 
 struct Object;
 
-class SymbolTable {
+struct SymbolTable {
     std::map<std::string, Object *> symbols;
     std::optional<SymbolTable *> parent;
 
-public:
     SymbolTable() {
         this->parent = std::nullopt;
     }
@@ -29,6 +28,13 @@ public:
         return nullptr;
     }
 
+    Object* get_local(const std::string &name) {
+        if(this->symbols.contains(name))
+            return this->symbols[name];
+
+        return nullptr;
+    }
+
     void set(std::string name, Object *value) {
         if (this->parent.has_value()) {
             if (this->parent.value()->get(name) != nullptr) {
@@ -40,8 +46,26 @@ public:
         this->symbols[name] = value;
     }
 
+    void set_local(std::string name, Object *value) {
+        this->symbols[name] = value;
+    }
+
     void remove(const std::string &name) {
         this->symbols.erase(name);
+    }
+
+    bool exists(const std::string &name) {
+        if (this->symbols.contains(name))
+            return true;
+
+        if (this->parent.has_value())
+            return this->parent.value()->exists(name);
+
+        return false;
+    }
+
+    bool exists_local(const std::string &name) {
+        return this->symbols.contains(name);
     }
 };
 

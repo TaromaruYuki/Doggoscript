@@ -7,8 +7,7 @@ fn join($elements, $seperator) {
     val $len is len($elements)
 
     for $i in 0..$len {
-        val $obj is str(get($elements, $i))
-        $result is $result + $obj
+        $result is $result + str(get($elements, $i))
 
         if $i != $len - 1 {
             $result is $result + $seperator
@@ -40,7 +39,7 @@ print($res)
 
 val $fib is fibonacci(100)
 
-print(join($fib, " "))
+print(join(fibonacci(100), " "))
 $res is $res + join($fib, " ")
 
 print("10 + 20 is...")

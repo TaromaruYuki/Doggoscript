@@ -1,0 +1,52 @@
+print("=== User class Test ===")
+class Test {
+    fn __constructor($a) {
+        val $this->$a is $a
+    }
+
+    fn hello($hello) {
+        print("Hello, world!")
+        $this->$a is 100
+        print($hello)
+    }
+
+    fn __string() {
+        return "Custom Repr"
+    }
+}
+
+val $cls_test is Test(10)
+print($cls_test)
+print($cls_test->$a)
+$cls_test->hello("A argument")
+print($cls_test->$a)
+
+print("=== String Test ===")
+
+val $str_test is "Hello world! How are you?"
+print($str_test)
+print($str_test->length())
+print($str_test->lower())
+print($str_test->upper())
+print($str_test->replace(" ", "_"))
+
+print("=== List Test ===")
+
+val $list_test is [1, 2, 3]
+print($list_test)
+print($list_test->length())
+$list_test->append(4)
+print($list_test)
+print($list_test->extend([5, 6]))
+$list_test->pop(2)
+print($list_test)
+print($list_test->get(3))
+$list_test->set(0, 0)
+print($list_test)
+
+print("=== Dict Test ===")
+val $dict_test is {"a" -> 1}
+
+print($dict_test)
+print($dict_test->get("a"))
+print($dict_test->set("b", 2))

@@ -14,7 +14,7 @@ enum class NodeType {
     IdentifierNode,             // Done
     StringNode,                 // Done
     ListNode,                   // Done
-    DictNode,                   // Not Done
+    DictNode,                   // Done
     StatementsNode,             // Done
     BinaryOperationNode,        // Done
     UnaryOperationNode,         // Done
@@ -29,6 +29,7 @@ enum class NodeType {
     ReturnNode,                 // Done
     ContinueNode,               // Done
     BreakNode,                  // Done
+    ClassDefinitionNode,        // Done
     IncludeNode,                // Done
 };
 
@@ -38,7 +39,7 @@ const std::unordered_map<NodeType, std::string> node_type_to_str = {
         {NodeType::IdentifierNode,           "IdentifierNode"},
         {NodeType::StringNode,               "StringNode"},
         {NodeType::ListNode,                 "ListNode"},
-        {NodeType::DictNode, "DictNode"},
+        {NodeType::DictNode,                 "DictNode"},
         {NodeType::StatementsNode,           "StatementsNode"},
         {NodeType::BinaryOperationNode,      "BinaryOperationNode"},
         {NodeType::UnaryOperationNode,       "UnaryOperationNode"},
@@ -53,6 +54,7 @@ const std::unordered_map<NodeType, std::string> node_type_to_str = {
         {NodeType::ReturnNode,               "ReturnNode"},
         {NodeType::ContinueNode,             "ContinueNode"},
         {NodeType::BreakNode,                "BreakNode"},
+        {NodeType::ClassDefinitionNode,      "ClassDefinitionNode"},
         {NodeType::IncludeNode,              "IncludeNode"},
 };
 
@@ -161,10 +163,12 @@ struct UnaryOperationNode : public BaseNode {
 
 struct VariableAssignmentNode : public BaseNode {
     BaseNode *value;
+    std::vector<Token> children;
 
-    explicit VariableAssignmentNode(Token &name, BaseNode *value) : BaseNode() {
+    explicit VariableAssignmentNode(Token &name, std::vector<Token> &children, BaseNode *value) : BaseNode() {
         this->type = NodeType::VariableAssignmentNode;
         this->token = new Token(name);
+        this->children = std::move(children);
         this->value = value;
         this->start_pos = &this->token->start_pos.value();
         this->end_pos = value->end_pos;
@@ -173,10 +177,12 @@ struct VariableAssignmentNode : public BaseNode {
 
 struct VariableReassignmentNode : public BaseNode {
     BaseNode *value;
+    std::vector<Token> children;
 
-    explicit VariableReassignmentNode(Token &name, BaseNode *value) : BaseNode() {
+    explicit VariableReassignmentNode(Token &name, std::vector<Token> &children, BaseNode *value) : BaseNode() {
         this->type = NodeType::VariableReassignmentNode;
         this->token = new Token(name);
+        this->children = std::move(children);
         this->value = value;
         this->start_pos = &this->token->start_pos.value();
         this->end_pos = value->end_pos;
@@ -184,9 +190,12 @@ struct VariableReassignmentNode : public BaseNode {
 };
 
 struct VariableAccessNode : public BaseNode {
-    explicit VariableAccessNode(Token &name) : BaseNode() {
+    std::vector<Token> children;
+
+    explicit VariableAccessNode(Token &name, std::vector<Token> &children) : BaseNode() {
         this->type = NodeType::VariableAccessNode;
         this->token = new Token(name);
+        this->children = std::move(children);
         this->start_pos = &this->token->start_pos.value();
         this->end_pos = &this->token->end_pos.value();
     }
@@ -251,14 +260,16 @@ struct FunctionDefinitionNode : public BaseNode {
     std::vector<Token *> arg_names;
     BaseNode *body_node;
     bool should_auto_return;
+    bool should_add_to_table;
 
     FunctionDefinitionNode(std::optional<Token> &name, std::vector<Token *> arg_names, BaseNode *body_node,
-                           bool should_auto_return) : BaseNode() {
+                           bool should_auto_return, bool should_add_to_table) : BaseNode() {
         this->type = NodeType::FunctionDefinitionNode;
         this->name = name;
         this->arg_names = std::move(arg_names);
         this->body_node = body_node;
         this->should_auto_return = should_auto_return;
+        this->should_add_to_table = should_add_to_table;
 
         if (this->name.has_value()) {
             this->start_pos = &this->name.value().start_pos.value();
@@ -310,6 +321,18 @@ struct ContinueNode : public BaseNode {
 struct BreakNode : public BaseNode {
     BreakNode(Position &start_pos, Position &end_pos) : BaseNode() {
         this->type = NodeType::BreakNode;
+        this->start_pos = new Position(start_pos);
+        this->end_pos = new Position(end_pos);
+    }
+};
+
+struct ClassDefinitionNode : public BaseNode {
+    BaseNode* body_node;
+
+    ClassDefinitionNode(Token &class_name, BaseNode* body_node, Position &start_pos, Position &end_pos) : BaseNode() {
+        this->type = NodeType::ClassDefinitionNode;
+        this->token = new Token(class_name);
+        this->body_node = body_node;
         this->start_pos = new Position(start_pos);
         this->end_pos = new Position(end_pos);
     }

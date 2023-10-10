@@ -91,6 +91,7 @@ const std::vector<std::string> keywords = {
         "return",
         "continue",
         "break",
+        "class"
         "incl"
 };
 

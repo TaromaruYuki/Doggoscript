@@ -90,10 +90,10 @@ struct Function : public BaseFunction {
 
         Object *return_value;
 
-        if (this->should_auto_return) {
-            return_value = value.value();
-        } else if (result.function_return_value.has_value()) {
+        if (result.function_return_value.has_value()) {
             return_value = result.function_return_value.value();
+        } else if (this->should_auto_return) {
+            return_value = value.value();
         } else {
             return_value = nullptr;
         }

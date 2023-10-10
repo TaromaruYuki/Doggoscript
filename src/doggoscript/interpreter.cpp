@@ -44,6 +44,8 @@ RuntimeResult Interpreter::visit(BaseNode *node, Context &context) {
             return this->visit_ForNode(static_cast<ForNode *>(node), context);
         case NodeType::WhileNode:
             return this->visit_WhileNode(static_cast<WhileNode *>(node), context);
+        case NodeType::ClassDefinitionNode:
+            return this->visit_ClassDefinitionNode(static_cast<ClassDefinitionNode *>(node), context);
         case NodeType::IncludeNode:
             return this->visit_IncludeNode(static_cast<IncludeNode *>(node), context);
         default: {
@@ -54,25 +56,31 @@ RuntimeResult Interpreter::visit(BaseNode *node, Context &context) {
 }
 
 RuntimeResult Interpreter::visit_NumberNode(NumberNode *node, Context &context) {
-    auto *number = new Number(node->token->value);
-    number->set_pos(*node->start_pos, *node->end_pos);
-    number->set_context(&context);
+    auto *number_cls = new NumberClass(std::stod(node->token->value));
+    number_cls->set_pos(*node->start_pos, *node->end_pos);
+    number_cls->set_context(&context);
+
+    auto *number = new Instance(number_cls);
 
     return *RuntimeResult().success(number);
 }
 
 RuntimeResult Interpreter::visit_BooleanNode(BooleanNode *node, Context &context) {
-    auto *boolean = new Boolean(node->token->value);
-    boolean->set_pos(*node->start_pos, *node->end_pos);
-    boolean->set_context(&context);
+    auto *boolean_cls = new BooleanClass(node->token->value == "true");
+    boolean_cls->set_pos(*node->start_pos, *node->end_pos);
+    boolean_cls->set_context(&context);
+
+    auto *boolean = new Instance(boolean_cls);
 
     return *RuntimeResult().success(boolean);
 }
 
 RuntimeResult Interpreter::visit_StringNode(StringNode *node, Context &context) {
-    auto *string = new String(node->token->value);
-    string->set_pos(*node->start_pos, *node->end_pos);
-    string->set_context(&context);
+    auto *string_cls = new StringClass(node->token->value);
+    string_cls->set_pos(*node->start_pos, *node->end_pos);
+    string_cls->set_context(&context);
+
+    auto *string = new Instance(string_cls);
 
     return *RuntimeResult().success(string);
 }
@@ -91,9 +99,11 @@ RuntimeResult Interpreter::visit_ListNode(ListNode *node, Context &context) {
             elements.push_back(reg_res.value());
     }
 
-    auto *list = new List(elements);
-    list->set_pos(*node->start_pos, *node->end_pos);
-    list->set_context(&context);
+    auto *list_cls = new ListClass(elements);
+    list_cls->set_pos(*node->start_pos, *node->end_pos);
+    list_cls->set_context(&context);
+
+    auto *list = new Instance(list_cls);
 
     return *result.success(list);
 }
@@ -183,9 +193,9 @@ RuntimeResult Interpreter::visit_UnaryOperationNode(UnaryOperationNode *node, Co
     Object *obj = obj_res.value();
 
     if (node->token->type == TokenType::Minus) {
-        Number neg_1 = Number(-1);
-        neg_1.set_context(&context);
-        ObjectResult res = *obj * neg_1;
+        Instance* neg_1 = NumberClass::new_instance(-1);
+        neg_1->set_context(&context);
+        ObjectResult res = *obj * *neg_1;
 
         if (std::get<1>(res).has_value())
             return *result.failure(std::get<1>(res).value());
@@ -214,10 +224,11 @@ RuntimeResult Interpreter::visit_StatementsNode(StatementsNode *node, Context &c
             return result;
 
         if (reg_res.has_value())
-            values.push_back(reg_res.value());
+            if(reg_res.value() != nullptr)
+                values.push_back(reg_res.value());
     }
 
-    return *result.success(values[values.size() - 1]);
+    return *result.success(new Statements(values));
 }
 
 RuntimeResult Interpreter::visit_VariableAssignmentNode(VariableAssignmentNode *node, Context &context) {
@@ -226,6 +237,48 @@ RuntimeResult Interpreter::visit_VariableAssignmentNode(VariableAssignmentNode *
     std::optional<Object *> value = result.reg(this->visit(node->value, context));
     if (result.should_return())
         return result;
+
+    if(!node->children.empty()) {
+        Object* parent = context.symbol_table->get(node->token->value);
+
+        if(parent == nullptr)
+            return *result.failure(NameError(
+                *node->start_pos, *node->end_pos,
+                "Variable '" + node->token->value + "' is not defined"
+            ));
+
+        if(parent->type != ObjectType::Instance)
+            return *result.failure(IllegalOperationError(
+                *node->start_pos, *node->end_pos,
+                "Cannot access member of non-instance"
+            ));
+
+        Instance* instance = static_cast<Instance*>(parent);
+        Instance* prev = nullptr;
+        Token* name;
+
+        for(size_t i = 0; i < node->children.size(); i++) {
+            name = &node->children[i];
+
+            if(instance->type != ObjectType::Instance)
+                return *result.failure(IllegalOperationError(
+                    *node->start_pos, *node->end_pos,
+                    "Cannot access member of non-instance"
+                ));
+
+            prev = instance;
+            instance = instance->symbol_table->exists_local(name->value) ? static_cast<Instance*>(instance->symbol_table->get_local(name->value)) : nullptr;
+
+            if(instance == nullptr && i != node->children.size() - 1)
+                return *result.failure(NameError(
+                    *node->start_pos, *node->end_pos,
+                    "Variable '" + name->value + "' is not defined"
+                ));
+        }
+
+        prev->symbol_table->set(name->value, value.value());
+        return *result.success(value.value());
+    }
 
     context.symbol_table->set(node->token->value, value.value());
     value.value()->set_pos(*node->start_pos, *node->end_pos);
@@ -244,6 +297,39 @@ RuntimeResult Interpreter::visit_VariableAccessNode(VariableAccessNode *node, Co
                 *node->start_pos, *node->end_pos,
                 "Variable '" + var_name + "' is not defined"
         ));
+
+    if(!node->children.empty()) {
+        auto* instance = static_cast<Instance*>(value);
+
+        auto* new_context = new Context(instance->cls->name);
+        new_context->parent = &context;
+        new_context->symbol_table = instance->symbol_table;
+
+        Token* name;
+
+        for(size_t i = 0; i < node->children.size(); i++) {
+            name = &node->children[i];
+
+            if(instance->type != ObjectType::Instance)
+                return *result.failure(IllegalOperationError(
+                        *node->start_pos, *node->end_pos,
+                        "Cannot access member of non-instance"
+                ));
+
+            instance = instance->symbol_table->exists_local(name->value) ? static_cast<Instance*>(instance->symbol_table->get_local(name->value)) : nullptr;
+
+            if(instance == nullptr && i != node->children.size() - 1)
+                return *result.failure(NameError(
+                        *node->start_pos, *node->end_pos,
+                        "Variable '" + name->value + "' is not defined"
+                ));
+        }
+
+        instance->set_pos(*node->start_pos, *node->end_pos);
+        instance->set_context(new_context);
+
+        return *result.success(instance);
+    }
 
     value->set_pos(*node->start_pos, *node->end_pos);
     value->set_context(&context);
@@ -265,6 +351,48 @@ RuntimeResult Interpreter::visit_VariableReassignmentNode(VariableReassignmentNo
                 "Variable '" + var_name + "' is not defined"
         ));
 
+    if(!node->children.empty()) {
+        Object* parent = context.symbol_table->get(node->token->value);
+
+        if(parent->type != ObjectType::Instance)
+            return *result.failure(IllegalOperationError(
+                    *node->start_pos, *node->end_pos,
+                    "Cannot access member of non-instance"
+            ));
+
+        auto* instance = static_cast<Instance*>(parent);
+        Instance* prev = nullptr;
+        Token* name;
+
+        for(size_t i = 0; i < node->children.size(); i++) {
+            name = &node->children[i];
+
+            if(instance->type != ObjectType::Instance)
+                return *result.failure(IllegalOperationError(
+                        *node->start_pos, *node->end_pos,
+                        "Cannot access member of non-instance"
+                ));
+
+            prev = instance;
+            instance = instance->symbol_table->exists_local(name->value) ? static_cast<Instance*>(instance->symbol_table->get_local(name->value)) : nullptr;
+
+            if(instance == nullptr && i != node->children.size() - 1)
+                return *result.failure(NameError(
+                        *node->start_pos, *node->end_pos,
+                        "Variable '" + name->value + "' is not defined"
+                ));
+        }
+
+        if (prev->symbol_table->get(var_name) == nullptr)
+            return *result.failure(NameError(
+                    *node->start_pos, *node->end_pos,
+                    "Variable '" + var_name + "' is not defined"
+            ));
+
+        prev->symbol_table->set(name->value, value.value());
+        return *result.success(value.value());
+    }
+
     context.symbol_table->set(var_name, value.value());
 
     return *result.success(value.value());
@@ -281,7 +409,7 @@ RuntimeResult Interpreter::visit_FunctionDefinitionNode(FunctionDefinitionNode *
     auto *func = new Function(func_name, node->body_node, arg_names, node->should_auto_return);
     func->set_pos(*node->start_pos, *node->end_pos);
 
-    if (node->name.has_value())
+    if (node->name.has_value() && node->should_add_to_table)
         context.symbol_table->set(func_name, func);
 
     return *result.success(func);
@@ -296,6 +424,14 @@ RuntimeResult Interpreter::visit_IdentifierNode(IdentifierNode *node, Context &c
                 *node->start_pos, *node->end_pos,
                 "Function '" + node->token->value + "' is not defined"
         ));
+
+    if(value->type == ObjectType::Class) {
+        auto *class_copy = new Class(*static_cast<Class*>(value));
+        class_copy->set_context(&context);
+        class_copy->set_pos(*node->start_pos, *node->end_pos);
+
+        return *result.success(class_copy);
+    }
 
     auto *func = static_cast<BaseFunction *>(value);
 
@@ -331,11 +467,33 @@ RuntimeResult Interpreter::visit_CallNode(CallNode *node, Context &context) {
         args.push_back(arg_value.value());
     }
 
-    if (func_o->type != ObjectType::Function)
+    if (func_o->type != ObjectType::Function && func_o->type != ObjectType::Class)
         return *result.failure(IllegalOperationError(
                 *node->start_pos, *node->end_pos,
-                "Expected function"
+                "Expected function or class"
         ));
+
+    if(func_o->type == ObjectType::Class) {
+        auto* cls = static_cast<Class*>(func_o);
+        auto* instance = new Instance(cls);
+        instance->set_context(&context);
+        instance->set_pos(*node->start_pos, *node->end_pos);
+
+        if(!instance->item_exists("__constructor") && !args.empty())
+            return *result.failure(ArgumentError(
+                    *node->start_pos, *node->end_pos,
+                    "Class '" + cls->name + "' does not have a constructor, so it takes no arguments"
+            ));
+
+        if(instance->item_exists("__constructor")) {
+            result.reg(instance->construct(args));
+
+            if (result.should_return())
+                return result;
+        }
+
+        return *result.success(instance);
+    }
 
     auto *func = static_cast<BaseFunction *>(func_o);
     std::optional<Object *> return_value = result.reg((*func)(args));
@@ -421,45 +579,27 @@ RuntimeResult Interpreter::visit_ForNode(ForNode *node, Context &context) {
     auto *for_symbol_table = new SymbolTable(context.symbol_table);
     for_context.symbol_table = for_symbol_table;
 
-    std::optional<Object *> start_value_o = result.reg(this->visit(node->start_value, for_context));
-    if (result.should_return())
+    std::optional<Object *> start_obj = result.reg(this->visit(node->start_value, for_context));
+    if(result.should_return())
         return result;
 
-    std::optional<Object *> end_value_o = result.reg(this->visit(node->end_value, for_context));
-    if (result.should_return())
+    std::optional<Object *> end_obj = result.reg(this->visit(node->end_value, for_context));
+    if(result.should_return())
         return result;
 
-    std::optional<Object *> step_value_o;
+    std::optional<Object *> step_obj;
 
-    if (node->step_value != nullptr) {
-        step_value_o = result.reg(this->visit(node->step_value, for_context));
-        if (result.should_return())
+    if(node->step_value != nullptr) {
+        step_obj = result.reg(this->visit(node->step_value, for_context));
+        if(result.should_return())
             return result;
     } else {
-        step_value_o = new Number(1);
+        step_obj = NumberClass::new_instance(1);
     }
 
-    if (start_value_o.value()->type != ObjectType::Number)
-        return *result.failure(IllegalOperationError(
-                *node->start_pos, *node->end_pos,
-                "Expected number for start value"
-        ));
-
-    if (end_value_o.value()->type != ObjectType::Number)
-        return *result.failure(IllegalOperationError(
-                *node->start_pos, *node->end_pos,
-                "Expected number for end value"
-        ));
-
-    if (step_value_o.value()->type != ObjectType::Number)
-        return *result.failure(IllegalOperationError(
-                *node->start_pos, *node->end_pos,
-                "Expected number for step value"
-        ));
-
-    auto *start_value = static_cast<Number *>(start_value_o.value());
-    auto *end_value = static_cast<Number *>(end_value_o.value());
-    auto *step_value = static_cast<Number *>(step_value_o.value());
+    auto* start_value = static_cast<NumberClass*>(static_cast<Instance*>(start_obj.value())->cls);
+    auto* end_value = static_cast<NumberClass*>(static_cast<Instance*>(end_obj.value())->cls);
+    auto* step_value = static_cast<NumberClass*>(static_cast<Instance*>(step_obj.value())->cls);
 
     double i = start_value->value;
 
@@ -472,7 +612,7 @@ RuntimeResult Interpreter::visit_ForNode(ForNode *node, Context &context) {
     }
 
     while (cond(i, end_value->value)) {
-        for_symbol_table->set(node->token->value, new Number(i));
+        for_symbol_table->set(node->token->value, NumberClass::new_instance(i));
         i += step_value->value;
 
         std::optional<Object *> value = result.reg(this->visit(node->body, for_context));
@@ -533,11 +673,28 @@ RuntimeResult Interpreter::visit_DictNode(DictNode *node, Context &context) {
         elements.emplace_back(key.value(), value.value());
     }
 
-    auto *dict = new Dict(elements);
-    dict->set_pos(*node->start_pos, *node->end_pos);
-    dict->set_context(&context);
+    auto *dict_cls = new DictClass(elements);
+    dict_cls->set_pos(*node->start_pos, *node->end_pos);
+    dict_cls->set_context(&context);
+
+    auto *dict = new Instance(dict_cls);
 
     return *result.success(dict);
+}
+
+RuntimeResult Interpreter::visit_ClassDefinitionNode(ClassDefinitionNode *node, Context &context) {
+    RuntimeResult result;
+
+    Statements* body = static_cast<Statements*>(result.reg(this->visit(node->body_node, context)).value());
+    if (result.should_return())
+        return result;
+
+    auto* cls = new Class(node->token->value, body->elements);
+    cls->set_context(&context);
+    cls->symbol_table->parent = context.symbol_table;
+    context.symbol_table->set(node->token->value, cls);
+
+    return *result.success(cls);
 }
 
 RuntimeResult Interpreter::visit_IncludeNode(IncludeNode *node, Context &context) {
@@ -566,5 +723,3 @@ RuntimeResult Interpreter::visit_IncludeNode(IncludeNode *node, Context &context
 
     return *result.success(nullptr);
 }
-
-

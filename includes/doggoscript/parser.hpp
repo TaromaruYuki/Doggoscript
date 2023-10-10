@@ -99,6 +99,8 @@ class Parser {
 
     ParseResult func_def();
 
+    ParseResult class_def();
+
     ParseResult bin_op(const std::function<ParserFunction> &func, std::vector<TokenType> ops,
                        std::optional<std::function<ParserFunction>> func2 = std::nullopt);
 
@@ -110,4 +112,5 @@ public:
     }
 
     ParseResult parse();
+
 };
