@@ -17,26 +17,25 @@
 - [x] Control Statements
 - [x] Comments
 - [X] Scopes (outside a function)
-- [ ] Classes
+- [X] Classes
 - [X] Modules
 - [ ] Error Handling
 - [X] Maps / Dicts
 - [X] File IO
-- [ ] List Indexing
-- [ ] Assignment Operators
 
 ## Example
 
 ```
 // This is a comment :)
 
+incl "math"
+
 fn join($elements, $seperator) {
     val $result is ""
-    val $len is len($elements)
+    val $len is $elements->length()
 
     for $i in 0..$len {
-        val $obj is str(get($elements, $i))
-        $result is $result + $obj
+        $result is $result + str($elements->at($i))
 
         if $i != $len - 1 {
             $result is $result + $seperator
@@ -52,7 +51,7 @@ fn fibonacci($n) {
     val $result is []
 
     for $i in 0..$n {
-        append($result, $a)
+        $result->append($a)
 
         val $temp is $a
         $a is $b
@@ -62,11 +61,22 @@ fn fibonacci($n) {
     return $result
 }
 
-print("Calculating fibonacci sequence up to 100...")
+val $res is "Calculating fibonacci sequence up to 100...\n\n"
+
+print($res)
 
 val $fib is fibonacci(100)
 
-print(join($fib, " "))
+print(join(fibonacci(100), " "))
+$res is $res + join($fib, " ")
+
+print("10 + 20 is...")
+print(add(10, 20))
+
+val $file_str is load_file("hello.txt")
+print("File 'hello.txt' content: " + $file_str)
+
+save_file("save.txt", $res)
 ```
 
 View `grammar.txt` to view the grammar
