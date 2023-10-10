@@ -41,16 +41,16 @@ Syntax:
         val $my_list is [1, 2, 3]
 
         Accessing a list:
-        get($my_list, 0) // Returns 1
+        $my_list->at(0) // Returns 1
 
         Appending to a list:
-        append($my_list, 4)
+        $my_list->append(4)
 
         Removing from a list:
-        pop($my_list, 0) // Returns 1 and removes it from the list
+        $my_list->pop(0) // Returns 1 and removes it from the list
 
         Merging lists:
-        extend($my_list, [5, 6, 7]) // Modifies $my_list if it's a variable. Returns the new list.
+        $my_list->extend([5, 6, 7]) // Modifies $my_list if it's a variable. Returns the new list.
 
     Strings:
         val $my_string is "Hello, world!"
@@ -70,14 +70,6 @@ Syntax:
     Built-in Functions:
         print(<VALUE>)
         input()
-        append(<LIST>, <VALUE>)
-        pop(<LIST>, <INDEX>)
-        extend(<LIST1>, <LIST2>)
-        get(<LIST>, <INDEX>)
-        len(<VALUE>)
-        str(<VALUE>)
-        dict_get(<DICT>, <KEY>)
-        dict_get(<DICT>, <KEY>, <VALUE>)
         load_file(<FILE_NAME>)
         save_file(<FILE_NAME>, <VALUE>)
 
@@ -86,10 +78,15 @@ Syntax:
 
     Dicts:
         val $dict is {"foo" -> "bar"}
-        dict_get($dict, "foo") // Returns "bar"
-        dict_set($dict, "bar", "baz") // Returns {"foo" -> "bar", "bar" -> "baz"}
+        $dict->get("foo") // Returns "bar"
+        $dict->set("bar", "baz") // Returns {"foo" -> "bar", "bar" -> "baz"}
 
     File IO:
         val $file_str is load_file("hello.txt")
         print("File 'hello.txt' content: " + $file_str) // Prints the file contents
         save_file("save.txt", $file_str) // Saves the $file_str variable into 'save.txt'
+
+    Classes:
+        class Person {
+
+        }
