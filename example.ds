@@ -4,10 +4,10 @@ incl "math"
 
 fn join($elements, $seperator) {
     val $result is ""
-    val $len is len($elements)
+    val $len is $elements->length()
 
     for $i in 0..$len {
-        $result is $result + str(get($elements, $i))
+        $result is $result + str($elements->at($i))
 
         if $i != $len - 1 {
             $result is $result + $seperator
@@ -23,7 +23,7 @@ fn fibonacci($n) {
     val $result is []
 
     for $i in 0..$n {
-        append($result, $a)
+        $result->append($a)
 
         val $temp is $a
         $a is $b
