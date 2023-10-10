@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.22)
 project(Doggoscript VERSION 0.3.0)
 
 set("IS_DEBUG" 0)
