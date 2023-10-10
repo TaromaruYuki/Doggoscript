@@ -9,13 +9,15 @@ struct SaveFileFunction : public BuiltInFunction {
     static RuntimeResult call(std::vector<Object *> args) {
         RuntimeResult result;
 
-        if (args[0]->type != ObjectType::String)
+        BaseClass *file_name_cls = dynamic_cast<Instance*>(args[0])->cls;
+
+        if(file_name_cls->cls_type != BuiltInType::String)
             return *result.failure(ArgumentError(
                     *args[0]->start_pos, *args[0]->end_pos,
-                    "First argument must be a string"
+                    "Expected string for file name."
             ));
 
-        auto *file_name = dynamic_cast<String *>(args[0]);
+        StringClass* file_name = static_cast<StringClass*>(file_name_cls);
 
         std::ofstream file(file_name->value);
 

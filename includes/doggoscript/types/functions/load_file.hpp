@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include "../function.hpp"
+#include "../classes/string_class.hpp"
 
 struct LoadFileFunction : public BuiltInFunction {
     LoadFileFunction() : BuiltInFunction("load_file", {"file_name"}, LoadFileFunction::call) {}
@@ -9,13 +10,15 @@ struct LoadFileFunction : public BuiltInFunction {
     static RuntimeResult call(std::vector<Object *> args) {
         RuntimeResult result;
 
-        if (args[0]->type != ObjectType::String)
+        BaseClass *file_name_cls = dynamic_cast<Instance*>(args[0])->cls;
+
+        if(file_name_cls->cls_type != BuiltInType::String)
             return *result.failure(ArgumentError(
-                    *args[0]->start_pos, *args[0]->end_pos,
-                    "First argument must be a string"
+                *args[0]->start_pos, *args[0]->end_pos,
+                "Expected string for file name."
             ));
 
-        String *file_name = dynamic_cast<String *>(args[0]);
+        StringClass* file_name = static_cast<StringClass*>(file_name_cls);
 
         std::ifstream file(file_name->value);
 
@@ -29,6 +32,6 @@ struct LoadFileFunction : public BuiltInFunction {
         std::string src((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
         file.close();
 
-        return *result.success(new String(src));
+        return *result.success(StringClass::new_instance(src));
     }
 };
