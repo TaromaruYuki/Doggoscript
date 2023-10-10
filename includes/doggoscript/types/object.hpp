@@ -21,6 +21,7 @@ const std::unordered_map<ObjectType, std::string> object_type_to_string = {
         {ObjectType::Object,     "object"},
         {ObjectType::Statements, "statements"},
         {ObjectType::Instance,   "instance"},
+        {ObjectType::Class,      "class"},
 };
 
 struct Object;

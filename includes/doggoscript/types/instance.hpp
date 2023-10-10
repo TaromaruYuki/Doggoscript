@@ -78,4 +78,116 @@ struct Instance : public Object {
 
         return *result.success(this);
     }
+
+    bool is_true() override {
+        if(this->cls->cls_type != BuiltInType::UserCreated) {
+            return this->cls->is_true();
+        }
+
+        return Object::is_true();
+    }
+
+    ObjectResult operator+(Object &other) override {
+        if(this->cls->cls_type != BuiltInType::UserCreated) {
+            return this->cls->operator+(other);
+        }
+
+        return Object::operator+(other);
+    }
+
+    ObjectResult operator-(Object &other) override {
+        if(this->cls->cls_type != BuiltInType::UserCreated) {
+            return this->cls->operator-(other);
+        }
+
+        return Object::operator-(other);
+    }
+
+    ObjectResult operator*(Object &other) override {
+        if(this->cls->cls_type != BuiltInType::UserCreated) {
+            return this->cls->operator*(other);
+        }
+
+        return Object::operator*(other);
+    }
+
+    ObjectResult operator/(Object &other) override {
+        if(this->cls->cls_type != BuiltInType::UserCreated) {
+            return this->cls->operator/(other);
+        }
+
+        return Object::operator/(other);
+    }
+
+    ObjectResult logical_and(Object &other) override {
+        if(this->cls->cls_type != BuiltInType::UserCreated) {
+            return this->cls->logical_and(other);
+        }
+
+        return Object::logical_and(other);
+    }
+
+    ObjectResult logical_or(Object &other) override {
+        if(this->cls->cls_type != BuiltInType::UserCreated) {
+            return this->cls->logical_or(other);
+        }
+
+        return Object::logical_or(other);
+    }
+
+    ObjectResult logical_not() override {
+        if(this->cls->cls_type != BuiltInType::UserCreated) {
+            return this->cls->logical_not();
+        }
+
+        return Object::logical_not();
+    }
+
+    ObjectResult operator<(Object &other) override {
+        if(this->cls->cls_type != BuiltInType::UserCreated) {
+            return this->cls->operator<(other);
+        }
+
+        return Object::operator<(other);
+    }
+
+    ObjectResult operator<=(Object &other) override {
+        if(this->cls->cls_type != BuiltInType::UserCreated) {
+            return this->cls->operator<=(other);
+        }
+
+        return Object::operator<=(other);
+    }
+
+    ObjectResult operator>(Object &other) override {
+        if(this->cls->cls_type != BuiltInType::UserCreated) {
+            return this->cls->operator>(other);
+        }
+
+        return Object::operator>(other);
+    }
+
+    ObjectResult operator>=(Object &other) override {
+        if(this->cls->cls_type != BuiltInType::UserCreated) {
+            return this->cls->operator>=(other);
+        }
+
+        return Object::operator>=(other);
+    }
+
+    ObjectResult operator==(Object &other) override {
+        if(this->cls->cls_type != BuiltInType::UserCreated) {
+            return this->cls->operator==(other);
+        }
+
+        return Object::operator==(other);
+    }
+
+    ObjectResult operator!=(Object &other) override {
+        if(this->cls->cls_type != BuiltInType::UserCreated) {
+            return this->cls->operator!=(other);
+        }
+
+        return Object::operator!=(other);
+    }
 };

@@ -105,7 +105,6 @@ RuntimeResult Interpreter::visit_ListNode(ListNode *node, Context &context) {
     return *result.success(list);
 }
 
-// FIXME: New type system
 RuntimeResult Interpreter::visit_BinaryOperationNode(BinaryOperationNode *node, Context &context) {
     RuntimeResult result;
 
@@ -182,7 +181,6 @@ RuntimeResult Interpreter::visit_BinaryOperationNode(BinaryOperationNode *node, 
     return *result.success(obj);
 }
 
-// FIXME: Possibly needs fixed with new type system?
 RuntimeResult Interpreter::visit_UnaryOperationNode(UnaryOperationNode *node, Context &context) {
     RuntimeResult result;
     std::optional<Object *> obj_res = result.reg(this->visit(node->value, context));
