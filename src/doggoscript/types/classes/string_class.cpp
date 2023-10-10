@@ -61,4 +61,26 @@ StringClass::StringClass(std::string initial_value) : BuiltInClass("String") {
 
         return *result.success(this->new_instance(replaced));
     }));
+
+    this->symbol_table->set("at", new BuiltInFunction("at", {"index"}, [this](std::vector<Object*> args) -> RuntimeResult {
+        RuntimeResult result;
+
+        BaseClass* index_cls = static_cast<Instance*>(args[0])->cls;
+
+        if(index_cls->cls_type != BuiltInType::Number)
+            return *result.failure(ArgumentError(
+                    *this->start_pos, *this->end_pos,
+                    "Invalid arguments for at function."
+            ));
+
+        int index = static_cast<NumberClass*>(index_cls)->value;
+
+        if(index < 0 || index >= this->value.length())
+            return *result.failure(ArgumentError(
+                    *this->start_pos, *this->end_pos,
+                    "Index out of range."
+            ));
+
+        return *result.success(this->new_instance(std::string(1, this->value[index])));
+    }));
 }
