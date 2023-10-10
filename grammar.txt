@@ -88,5 +88,22 @@ Syntax:
 
     Classes:
         class Person {
+            fn __constructor($name, $age) {
+                $this->$name is $name
+                $this->$age is $age
+            }
 
+            fn hello() {
+                print("Hello! My name is " + $this->$name + "! I am " + str($this->$age) + " years old!")
+            }
+
+            fn birthday() {
+                print("Happy birthday, " + $this->$name + "!")
+                $this->$age is $this->$age + 1
+            }
         }
+
+        val $person is Person("John", 37)
+        $person->hello()
+        $person->birthday()
+        $person->hello()
