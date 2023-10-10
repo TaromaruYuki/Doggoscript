@@ -1,5 +1,6 @@
 #include "../../includes/doggoscript/interpreter.hpp"
 #include "../../includes/doggoscript/types/types.hpp"
+#include "../../includes/doggoscript/doggoscript.hpp"
 
 RuntimeResult Interpreter::visit(BaseNode *node, Context &context) {
     switch (node->type) {
@@ -45,6 +46,8 @@ RuntimeResult Interpreter::visit(BaseNode *node, Context &context) {
             return this->visit_WhileNode(static_cast<WhileNode *>(node), context);
         case NodeType::ClassDefinitionNode:
             return this->visit_ClassDefinitionNode(static_cast<ClassDefinitionNode *>(node), context);
+        case NodeType::IncludeNode:
+            return this->visit_IncludeNode(static_cast<IncludeNode *>(node), context);
         default: {
             std::cerr << "Could not visit node '" << node_type_to_str.at(node->type) << "'" << std::endl;
             exit(EXIT_FAILURE);
@@ -692,4 +695,31 @@ RuntimeResult Interpreter::visit_ClassDefinitionNode(ClassDefinitionNode *node, 
     context.symbol_table->set(node->token->value, cls);
 
     return *result.success(cls);
+}
+
+RuntimeResult Interpreter::visit_IncludeNode(IncludeNode *node, Context &context) {
+    RuntimeResult result;
+
+    std::fstream file(std::format("{}.ds", node->path), std::ios::in);
+    if (!file.is_open())
+        return *result.failure(FileNotFoundError(
+                *node->start_pos, *node->end_pos,
+                std::format("{}.ds", node->path)
+        ));
+
+    std::string code;
+
+    while (!file.eof()) {
+        std::string line;
+        std::getline(file, line);
+        code += line + "\n";
+    }
+
+    file.close();
+
+    DoggoscriptResult ds_result = run(code, context.symbol_table);
+    if (ds_result.error.has_value())
+        return *result.failure(ds_result.error.value());
+
+    return *result.success(nullptr);
 }

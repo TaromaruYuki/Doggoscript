@@ -14,7 +14,7 @@ enum class NodeType {
     IdentifierNode,             // Done
     StringNode,                 // Done
     ListNode,                   // Done
-    DictNode,                   // Not Done
+    DictNode,                   // Done
     StatementsNode,             // Done
     BinaryOperationNode,        // Done
     UnaryOperationNode,         // Done
@@ -30,6 +30,7 @@ enum class NodeType {
     ContinueNode,               // Done
     BreakNode,                  // Done
     ClassDefinitionNode,        // Done
+    IncludeNode,                // Done
 };
 
 const std::unordered_map<NodeType, std::string> node_type_to_str = {
@@ -54,6 +55,7 @@ const std::unordered_map<NodeType, std::string> node_type_to_str = {
         {NodeType::ContinueNode,             "ContinueNode"},
         {NodeType::BreakNode,                "BreakNode"},
         {NodeType::ClassDefinitionNode,      "ClassDefinitionNode"},
+        {NodeType::IncludeNode,              "IncludeNode"},
 };
 
 struct BaseNode {
@@ -331,6 +333,18 @@ struct ClassDefinitionNode : public BaseNode {
         this->type = NodeType::ClassDefinitionNode;
         this->token = new Token(class_name);
         this->body_node = body_node;
+        this->start_pos = new Position(start_pos);
+        this->end_pos = new Position(end_pos);
+    }
+};
+
+struct IncludeNode : public BaseNode {
+    std::string path;
+
+    IncludeNode(Token &path, Position &start_pos, Position &end_pos) : BaseNode() {
+        this->type = NodeType::IncludeNode;
+        this->token = new Token(path);
+        this->path = path.value;
         this->start_pos = new Position(start_pos);
         this->end_pos = new Position(end_pos);
     }

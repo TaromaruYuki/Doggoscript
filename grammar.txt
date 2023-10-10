@@ -76,6 +76,20 @@ Syntax:
         get(<LIST>, <INDEX>)
         len(<VALUE>)
         str(<VALUE>)
+        dict_get(<DICT>, <KEY>)
+        dict_get(<DICT>, <KEY>, <VALUE>)
+        load_file(<FILE_NAME>)
+        save_file(<FILE_NAME>, <VALUE>)
 
     Comments:
         // This is a comment
+
+    Dicts:
+        val $dict is {"foo" -> "bar"}
+        dict_get($dict, "foo") // Returns "bar"
+        dict_set($dict, "bar", "baz") // Returns {"foo" -> "bar", "bar" -> "baz"}
+
+    File IO:
+        val $file_str is load_file("hello.txt")
+        print("File 'hello.txt' content: " + $file_str) // Prints the file contents
+        save_file("save.txt", $file_str) // Saves the $file_str variable into 'save.txt'

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
 #include "nodes.hpp"
 #include "types/object.hpp"
 #include "context.hpp"
@@ -115,4 +116,6 @@ private:
     RuntimeResult visit_WhileNode(WhileNode *node, Context &context);
 
     RuntimeResult visit_ClassDefinitionNode(ClassDefinitionNode *node, Context &context);
+
+    RuntimeResult visit_IncludeNode(IncludeNode *node, Context &context);
 };

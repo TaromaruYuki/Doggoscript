@@ -1,5 +1,7 @@
 // This is a comment :)
 
+incl "math"
+
 fn join($elements, $seperator) {
     val $result is ""
     val $len is len($elements)
@@ -31,6 +33,19 @@ fn fibonacci($n) {
     return $result
 }
 
-print("Calculating fibonacci sequence up to 100...")
+val $res is "Calculating fibonacci sequence up to 100...\n\n"
+
+print($res)
+
+val $fib is fibonacci(100)
 
 print(join(fibonacci(100), " "))
+$res is $res + join($fib, " ")
+
+print("10 + 20 is...")
+print(add(10, 20))
+
+val $file_str is load_file("hello.txt")
+print("File 'hello.txt' content: " + $file_str)
+
+save_file("save.txt", $res)

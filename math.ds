@@ -1,0 +1,5 @@
+fn add($a, $b) { $a + $b }
+
+fn sub($a, $b) { $a - $b }
+
+fn mul($a, $b) { $a * $b }

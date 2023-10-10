@@ -6,7 +6,6 @@
 #include "context.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
-#include "interpreter.hpp"
 #include "error.hpp"
 #include "types/types.hpp"
 
