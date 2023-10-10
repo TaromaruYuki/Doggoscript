@@ -69,7 +69,7 @@ ListClass::ListClass(std::vector<Object*> initial_value) : BuiltInClass("List") 
         return *RuntimeResult().success(element);
     }));
 
-    this->symbol_table->set("get", new BuiltInFunction("get", { "index" }, [this](std::vector<Object*> args) -> RuntimeResult {
+    this->symbol_table->set("at", new BuiltInFunction("at", { "index" }, [this](std::vector<Object*> args) -> RuntimeResult {
         auto* index_cls = static_cast<Instance*>(args[0])->cls;
 
         if (index_cls->cls_type != BuiltInType::Number) {
