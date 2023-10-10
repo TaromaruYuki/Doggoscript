@@ -29,6 +29,7 @@ print($str_test->length())
 print($str_test->lower())
 print($str_test->upper())
 print($str_test->replace(" ", "_"))
+print($str_test->at(11))
 
 print("=== List Test ===")
 
@@ -40,7 +41,7 @@ print($list_test)
 print($list_test->extend([5, 6]))
 $list_test->pop(2)
 print($list_test)
-print($list_test->get(3))
+print($list_test->at(3))
 $list_test->set(0, 0)
 print($list_test)
 
