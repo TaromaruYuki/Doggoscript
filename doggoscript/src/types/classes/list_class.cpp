@@ -1,8 +1,7 @@
-#include "../../../../includes/doggoscript/types/classes/list_class.hpp"
+#include <doggoscript/types/classes/list_class.hpp>
 
-#include "../../../../includes/doggoscript/types/instance.hpp"
-#include "../../../../includes/doggoscript/types/classes/string_class.hpp"
-#include "../../../../includes/doggoscript/types/classes/number_class.hpp"
+#include <doggoscript/types/instance.hpp>
+#include <doggoscript/types/classes/number_class.hpp>
 
 Instance *ListClass::new_instance(std::vector<Object*> initial_value) {
     auto *str_cls = new ListClass(initial_value);

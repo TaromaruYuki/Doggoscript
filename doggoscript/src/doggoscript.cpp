@@ -1,4 +1,4 @@
-#include "../../includes/doggoscript/doggoscript.hpp"
+#include <doggoscript/doggoscript.hpp>
 
 DoggoscriptResult run(std::string src, SymbolTable *symbol_table) {
     Lexer lexer("stdin", src);

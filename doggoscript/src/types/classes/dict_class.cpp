@@ -1,7 +1,6 @@
-#include "../../../../includes/doggoscript/types/classes/dict_class.hpp"
+#include <doggoscript/types/classes/dict_class.hpp>
 
-#include "../../../../includes/doggoscript/types/instance.hpp"
-#include "../../../../includes/doggoscript/types/classes/string_class.hpp"
+#include <doggoscript/types/instance.hpp>
 
 Instance *DictClass::new_instance(std::vector<std::tuple<Object *, Object *>> initial_value) {
     auto *str_cls = new DictClass(initial_value);

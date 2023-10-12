@@ -1,6 +1,6 @@
-#include "../../includes/doggoscript/interpreter.hpp"
-#include "../../includes/doggoscript/types/types.hpp"
-#include "../../includes/doggoscript/doggoscript.hpp"
+#include <doggoscript/interpreter.hpp>
+#include <doggoscript/types/types.hpp>
+#include <doggoscript/doggoscript.hpp>
 
 RuntimeResult Interpreter::visit(BaseNode *node, Context &context) {
     switch (node->type) {
