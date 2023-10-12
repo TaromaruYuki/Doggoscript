@@ -1,4 +1,4 @@
-#include "../../includes/doggoscript/parser.hpp"
+#include <doggoscript/parser.hpp>
 
 ParseResult Parser::parse() {
     ParseResult result = this->statements();

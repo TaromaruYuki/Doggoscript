@@ -1,9 +1,7 @@
-#include "../../../../includes/doggoscript/types/classes/string_class.hpp"
+#include <doggoscript/types/classes/string_class.hpp>
 
 #include <algorithm>
-#include "../../../../includes/doggoscript/types/function.hpp"
-#include "../../../../includes/doggoscript/types/instance.hpp"
-#include "../../../../includes/doggoscript/types/classes/number_class.hpp"
+#include <doggoscript/types/classes/number_class.hpp>
 
 Instance *StringClass::new_instance(std::string initial_value) {
     auto* str_cls = new StringClass(initial_value);

@@ -1,4 +1,4 @@
-#include "../../includes/doggoscript/lexer.hpp"
+#include <doggoscript/lexer.hpp>
 
 void Lexer::advance() {
     if (this->position.index < this->src.size()) {

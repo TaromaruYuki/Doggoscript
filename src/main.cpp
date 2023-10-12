@@ -1,4 +1,4 @@
-#include "../includes/doggoscript/doggoscript.hpp"
+#include <doggoscript/doggoscript.hpp>
 
 #include <iostream>
 #include <fstream>

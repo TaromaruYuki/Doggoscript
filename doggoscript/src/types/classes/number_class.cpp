@@ -1,7 +1,4 @@
-#include "../../../../includes/doggoscript/types/classes/number_class.hpp"
-
-#include "../../../../includes/doggoscript/types/instance.hpp"
-#include "../../../../includes/doggoscript/types/classes/string_class.hpp"
+#include <doggoscript/types/classes/number_class.hpp>
 
 Instance *NumberClass::new_instance(double initial_value) {
     auto *str_cls = new NumberClass(initial_value);

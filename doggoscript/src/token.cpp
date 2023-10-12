@@ -1,4 +1,4 @@
-#include "../../includes/doggoscript/token.hpp"
+#include <doggoscript/token.hpp>
 
 Token::Token(TokenType type, std::optional<std::string> value, std::optional<Position> start_pos,
              std::optional<Position> end_pos) : type(type) {

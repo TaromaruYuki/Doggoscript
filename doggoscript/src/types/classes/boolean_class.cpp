@@ -1,7 +1,4 @@
-#include "../../../../includes/doggoscript/types/classes/boolean_class.hpp"
-
-#include "../../../../includes/doggoscript/types/instance.hpp"
-#include "../../../../includes/doggoscript/types/classes/string_class.hpp"
+#include <doggoscript/types/classes/boolean_class.hpp>
 
 Instance *BooleanClass::new_instance(bool initial_value) {
     auto *str_cls = new BooleanClass(initial_value);
