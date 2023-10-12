@@ -22,13 +22,13 @@ class Lexer {
 
     void advance();
 
-    std::tuple<Token, std::optional<Token>> create_number();
+    std::tuple<std::optional<Token>, std::optional<Token>, std::optional<BaseError>> create_number();
 
     Token create_power();
 
     Token create_minus_or_arrow();
 
-    Token create_string();
+    std::tuple<std::optional<Token>, std::optional<BaseError>> create_string();
 
     Token create_identifier();
 

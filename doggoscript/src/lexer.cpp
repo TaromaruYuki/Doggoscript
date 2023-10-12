@@ -117,15 +117,24 @@ LexerResult Lexer::tokenize() {
                 tokens.push_back(std::get<0>(token).value());
             }
                 break;
-            case '"':
-                tokens.push_back(this->create_string());
-                break;
+            case '"': {
+                auto token = this->create_string();
+                if (std::get<1>(token).has_value()) {
+                    return {.error = std::get<1>(token).value()};
+                }
+
+                tokens.push_back(std::get<0>(token).value());
+            } break;
             default: {
                 if (std::isalpha(this->current_character) || this->current_character == '_') {
                     tokens.push_back(this->create_identifier());
                 } else if (isdigit(this->current_character)) {
                     auto num = this->create_number();
-                    tokens.push_back(std::get<0>(num));
+                    if(std::get<2>(num).has_value()) {
+                        return {.error = std::get<2>(num).value()};
+                    }
+
+                    tokens.push_back(std::get<0>(num).value());
 
                     if (std::get<1>(num).has_value()) {
                         tokens.push_back(std::get<1>(num).value());
@@ -146,7 +155,7 @@ LexerResult Lexer::tokenize() {
     return {.tokens = tokens};
 }
 
-std::tuple<Token, std::optional<Token>> Lexer::create_number() {
+std::tuple<std::optional<Token>, std::optional<Token>, std::optional<BaseError>> Lexer::create_number() {
     std::string num;
     uint8_t dot_count = 0;
     Position start_pos(this->position);
@@ -162,6 +171,8 @@ std::tuple<Token, std::optional<Token>> Lexer::create_number() {
                     num.pop_back();
                     dot_count = 0;
                     break;
+                } else {
+                    return {std::nullopt, std::nullopt, IllegalCharacterError(start_pos, this->position, '.')};
                 }
                 break;
             }
@@ -179,7 +190,7 @@ std::tuple<Token, std::optional<Token>> Lexer::create_number() {
         token.type = TokenType::Float;
     }
 
-    return {token, through_token};
+    return {token, through_token, std::nullopt};
 }
 
 Token Lexer::create_power() {
@@ -194,7 +205,7 @@ Token Lexer::create_power() {
     return {TokenType::Multiply, std::nullopt, start_pos, Position(this->position)};
 }
 
-Token Lexer::create_string() {
+std::tuple<std::optional<Token>, std::optional<BaseError>> Lexer::create_string() {
     std::string str;
     Position start_pos(this->position);
     bool escape_character = false;
@@ -225,9 +236,13 @@ Token Lexer::create_string() {
         this->advance();
     }
 
+    if (this->current_character != '"') {
+        return {std::nullopt, ExpectedCharacterError(start_pos, this->position, '"')};
+    }
+
     this->advance();
 
-    return {TokenType::String, str, start_pos, Position(this->position)};
+    return {Token(TokenType::String, str, start_pos, Position(this->position)), std::nullopt};
 }
 
 Token Lexer::create_identifier() {
