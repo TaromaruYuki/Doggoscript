@@ -18,6 +18,7 @@ enable_testing()
 add_executable(
     Doggoscript_Tests
     tests/lexer_tests.cpp
+    tests/parser_tests.cpp
 )
 
 target_include_directories(Doggoscript_Tests PRIVATE doggoscript/include)
