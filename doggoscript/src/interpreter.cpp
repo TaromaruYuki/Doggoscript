@@ -141,6 +141,9 @@ RuntimeResult Interpreter::visit_BinaryOperationNode(BinaryOperationNode *node, 
             obj_result = *left / *right;
         }
             break;
+        case TokenType::Power: {
+            obj_result = left->power_by(*right);
+        } break;
         case TokenType::LogicalAnd: {
             obj_result = left->logical_and(*right);
         }
