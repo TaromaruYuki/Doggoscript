@@ -4,6 +4,7 @@
 #include "../class.hpp"
 #include "../instance.hpp"
 #include "../../error.hpp"
+#include <cmath>
 
 struct Instance; // From doggoscript/types/instance.hpp
 
@@ -93,6 +94,19 @@ struct NumberClass : public BuiltInClass {
 
     ObjectResult logical_not() override {
         return {BooleanClass::new_instance(!this->value), std::nullopt};
+    }
+
+    ObjectResult power_by(Object &other) override {
+        if(other.type == ObjectType::Instance) {
+            auto* instance = dynamic_cast<Instance*>(&other);
+            if(instance->cls->cls_type != BuiltInType::Number) {
+                return {std::nullopt, InvalidSyntaxError(this->start_pos.value(), this->end_pos.value(), "Expected number")};
+            }
+
+            return {NumberClass::new_instance(std::pow(this->value, dynamic_cast<NumberClass*>(instance->cls)->value)), std::nullopt};
+        }
+
+        return Object::power_by(other);
     }
 
     ObjectResult operator<(Object &other) override {
