@@ -216,7 +216,6 @@ TEST(Parser, OrderOfOperations) {
 }
 
 TEST(Parser, OrderOfOperationsWithParens) {
-    GTEST_SKIP(); // TODO: Remove line
     Lexer lexer("test", "(1 + 2) * 3");
     LexerResult lex_result = lexer.tokenize();
 
@@ -728,8 +727,7 @@ TEST(Parser, ListWithElements) {
 }
 
 TEST(Parser, MultilineList) {
-    GTEST_SKIP(); // TODO: Fix code
-    Lexer lexer("test", "[\n1,\n2,\n3]");
+    Lexer lexer("test", "[\n1,\n2,\n3\n]");
     LexerResult lex_result = lexer.tokenize();
 
     ASSERT_FALSE(lex_result.error.has_value()) << "Error: " << lex_result.error.value().str();
@@ -813,7 +811,6 @@ TEST(Parser, DictWithElements) {
 }
 
 TEST(Parser, MultilineDict) {
-    GTEST_SKIP(); // TODO: Fix code
     Lexer lexer("test", "{\n\"A\" -> 1,\n\"B\" -> 2\n}");
     LexerResult lex_result = lexer.tokenize();
 
@@ -830,16 +827,20 @@ TEST(Parser, MultilineDict) {
     auto *statements_node = static_cast<StatementsNode *>(parse_result.node);
     ASSERT_EQ(statements_node->statements.size(), 1);
 
-    ASSERT_EQ(statements_node->statements[0]->type, NodeType::ListNode);
-    auto *list_node = static_cast<ListNode *>(statements_node->statements[0]);
+    ASSERT_EQ(statements_node->statements[0]->type, NodeType::DictNode);
+    auto *dict_node = static_cast<DictNode *>(statements_node->statements[0]);
 
-    ASSERT_EQ(list_node->elements.size(), 3);
-    ASSERT_EQ(list_node->elements[0]->type, NodeType::NumberNode);
-    ASSERT_EQ(list_node->elements[0]->token->value, "1");
-    ASSERT_EQ(list_node->elements[1]->type, NodeType::NumberNode);
-    ASSERT_EQ(list_node->elements[1]->token->value, "2");
-    ASSERT_EQ(list_node->elements[2]->type, NodeType::NumberNode);
-    ASSERT_EQ(list_node->elements[2]->token->value, "3");
+    ASSERT_EQ(dict_node->elements.size(), 2);
+
+    ASSERT_EQ(std::get<DICT_KEY>(dict_node->elements[0])->type, NodeType::StringNode);
+    ASSERT_EQ(std::get<DICT_KEY>(dict_node->elements[0])->token->value, "A");
+    ASSERT_EQ(std::get<DICT_VAL>(dict_node->elements[0])->type, NodeType::NumberNode);
+    ASSERT_EQ(std::get<DICT_VAL>(dict_node->elements[0])->token->value, "1");
+
+    ASSERT_EQ(std::get<DICT_KEY>(dict_node->elements[1])->type, NodeType::StringNode);
+    ASSERT_EQ(std::get<DICT_KEY>(dict_node->elements[1])->token->value, "B");
+    ASSERT_EQ(std::get<DICT_VAL>(dict_node->elements[1])->type, NodeType::NumberNode);
+    ASSERT_EQ(std::get<DICT_VAL>(dict_node->elements[1])->token->value, "2");
 }
 
 TEST(Parser, IfStatement) {
