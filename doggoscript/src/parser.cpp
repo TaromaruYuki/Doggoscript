@@ -1,4 +1,5 @@
 #include <doggoscript/parser.hpp>
+#include <iostream>
 
 ParseResult Parser::parse() {
     ParseResult result = this->statements();
@@ -378,6 +379,9 @@ ParseResult Parser::atom() {
             ));
         }
 
+        result.register_advancement();
+        this->advance();
+
         return *result.success(expr);
     } else if (value.type == TokenType::LSquare) {
         BaseNode *list_expr = result.reg(this->list_expr());
@@ -437,6 +441,11 @@ ParseResult Parser::list_expr() {
     result.register_advancement();
     this->advance();
 
+    while(this->current_token.value().type == TokenType::NewLine) {
+        result.register_advancement();
+        this->advance();
+    }
+
     if (this->current_token.value().type == TokenType::RSquare) {
         result.register_advancement();
         this->advance();
@@ -452,8 +461,18 @@ ParseResult Parser::list_expr() {
             result.register_advancement();
             this->advance();
 
+            while(this->current_token.value().type == TokenType::NewLine) {
+                result.register_advancement();
+                this->advance();
+            }
+
             elements.push_back(result.reg(this->expr()));
             if (result.should_return()) return result;
+        }
+
+        while(this->current_token.value().type == TokenType::NewLine) {
+            result.register_advancement();
+            this->advance();
         }
 
         if (this->current_token.value().type != TokenType::RSquare) {
@@ -834,6 +853,11 @@ ParseResult Parser::dict_expr() {
     result.register_advancement();
     this->advance();
 
+    while(this->current_token.value().type == TokenType::NewLine) {
+        result.register_advancement();
+        this->advance();
+    }
+
     std::vector<std::tuple<BaseNode *, BaseNode *>> elements;
 
     if (this->current_token.value().type == TokenType::RCurly) {
@@ -862,6 +886,11 @@ ParseResult Parser::dict_expr() {
             result.register_advancement();
             this->advance();
 
+            while(this->current_token.value().type == TokenType::NewLine) {
+                result.register_advancement();
+                this->advance();
+            }
+
             key = result.reg(this->atom());
             if (result.should_return()) return result;
 
@@ -879,6 +908,11 @@ ParseResult Parser::dict_expr() {
             if (result.should_return()) return result;
 
             elements.emplace_back(key, value);
+        }
+
+        while(this->current_token.value().type == TokenType::NewLine) {
+            result.register_advancement();
+            this->advance();
         }
 
         if (this->current_token.value().type != TokenType::RCurly) {

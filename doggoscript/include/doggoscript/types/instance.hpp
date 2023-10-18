@@ -49,6 +49,10 @@ struct Instance : public Object {
         return str.str();
     }
 
+    std::string print_friendly() override {
+        return this->cls->print_friendly();
+    }
+
     [[nodiscard]] bool item_exists(std::string item) const {
         return this->cls->symbol_table->exists(item);
     }
@@ -141,6 +145,14 @@ struct Instance : public Object {
         }
 
         return Object::logical_not();
+    }
+
+    ObjectResult power_by(Object &other) override {
+        if(this->cls->cls_type != BuiltInType::UserCreated) {
+            return this->cls->power_by(other);
+        }
+
+        return Object::power_by(other);
     }
 
     ObjectResult operator<(Object &other) override {

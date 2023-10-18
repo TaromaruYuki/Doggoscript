@@ -97,6 +97,12 @@ struct Object {
                                         "'!")};
     }
 
+    virtual ObjectResult power_by(Object &other) {
+        return {std::nullopt, TypeError(this->start_pos.value(), this->end_pos.value(),
+                                        "Cannot do operation '**' between '" + object_type_to_string.at(this->type) +
+                                        "' and  '" + object_type_to_string.at(other.type) + "'!")};
+    }
+
     virtual ObjectResult operator<(Object &other) {
         return {std::nullopt, TypeError(this->start_pos.value(), this->end_pos.value(),
                                         "Cannot do operation '<' on type '" + object_type_to_string.at(this->type) +

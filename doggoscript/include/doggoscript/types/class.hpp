@@ -47,4 +47,9 @@ struct BuiltInClass : public BaseClass {
     BuiltInClass(std::string name) : BaseClass(std::move(name)) { }
 
     virtual std::optional<std::string> to_string() { return std::nullopt; }
+    virtual std::string print_friendly() {
+        std::optional<std::string> str = this->to_string();
+
+        return str.has_value() ? str.value() : "";
+    }
 };

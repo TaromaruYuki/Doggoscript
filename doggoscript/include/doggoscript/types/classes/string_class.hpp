@@ -11,6 +11,10 @@ struct StringClass : public BuiltInClass {
     explicit StringClass(std::string initial_value);
 
     std::optional<std::string> to_string() override {
+        return "\"" + this->value + "\"";
+    }
+
+    std::string print_friendly() override {
         return this->value;
     }
 
