@@ -49,6 +49,10 @@ struct Instance : public Object {
         return str.str();
     }
 
+    std::string print_friendly() override {
+        return this->cls->print_friendly();
+    }
+
     [[nodiscard]] bool item_exists(std::string item) const {
         return this->cls->symbol_table->exists(item);
     }
