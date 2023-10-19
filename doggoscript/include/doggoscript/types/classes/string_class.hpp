@@ -14,15 +14,16 @@ struct StringClass : public BuiltInClass {
         return "\"" + this->value + "\"";
     }
 
-    std::string print_friendly() override {
-        return this->value;
-    }
+    std::string print_friendly() override { return this->value; }
 
     ObjectResult operator+(Object& other) override {
         if(other.type == ObjectType::Instance) {
             auto* instance = dynamic_cast<Instance*>(&other);
             if(instance->cls->cls_type == BuiltInType::String) {
-                return {this->new_instance(this->value + dynamic_cast<StringClass*>(instance->cls)->value), std::nullopt};
+                return { this->new_instance(
+                             this->value +
+                             dynamic_cast<StringClass*>(instance->cls)->value),
+                         std::nullopt };
             }
         }
 

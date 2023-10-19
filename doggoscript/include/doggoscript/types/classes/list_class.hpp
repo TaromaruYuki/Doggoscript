@@ -13,12 +13,10 @@ struct ListClass : public BuiltInClass {
 
     std::optional<std::string> to_string() override {
         std::string s = "[";
-        for (int i = 0; i < this->elements.size(); i++) {
+        for(int i = 0; i < this->elements.size(); i++) {
             s += this->elements[i]->str();
 
-            if (i != this->elements.size() - 1) {
-                s += ", ";
-            }
+            if(i != this->elements.size() - 1) { s += ", "; }
         }
         s += "]";
 

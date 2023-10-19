@@ -1,37 +1,29 @@
 #pragma once
 
-#include "object.hpp"
-#include "function.hpp"
 #include "../context.hpp"
+#include "function.hpp"
+#include "object.hpp"
 
-enum class BuiltInType {
-    UserCreated,
-    String,
-    Number,
-    Boolean,
-    List,
-    Dict
-};
+enum class BuiltInType { UserCreated, String, Number, Boolean, List, Dict };
 
 struct BaseClass : public Object {
-    std::string name;
-    SymbolTable *symbol_table;
-    BuiltInType cls_type;
+    std::string  name;
+    SymbolTable* symbol_table;
+    BuiltInType  cls_type;
 
     explicit BaseClass(std::string name) : name(std::move(name)) {
-        this->type = ObjectType::Class;
+        this->type         = ObjectType::Class;
         this->symbol_table = new SymbolTable();
     }
 
-    std::string str() override {
-        return "<class " + this->name + ">";
-    }
+    std::string str() override { return "<class " + this->name + ">"; }
 };
 
 struct Class : public BaseClass {
     std::vector<Object*> methods;
 
-    Class(std::string name, std::vector<Object*> methods) : BaseClass(std::move(name)), methods(methods) {
+    Class(std::string name, std::vector<Object*> methods) :
+        BaseClass(std::move(name)), methods(methods) {
         this->cls_type = BuiltInType::UserCreated;
 
         for(Object* method : methods) {
@@ -44,10 +36,10 @@ struct Class : public BaseClass {
 };
 
 struct BuiltInClass : public BaseClass {
-    BuiltInClass(std::string name) : BaseClass(std::move(name)) { }
+    BuiltInClass(std::string name) : BaseClass(std::move(name)) {}
 
     virtual std::optional<std::string> to_string() { return std::nullopt; }
-    virtual std::string print_friendly() {
+    virtual std::string                print_friendly() {
         std::optional<std::string> str = this->to_string();
 
         return str.has_value() ? str.value() : "";

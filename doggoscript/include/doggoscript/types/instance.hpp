@@ -1,15 +1,16 @@
 #pragma once
 
-#include <iomanip>
-#include "object.hpp"
 #include "class.hpp"
+#include "object.hpp"
+
+#include <iomanip>
 
 struct Instance : public Object {
-    BaseClass* cls;
+    BaseClass*   cls;
     SymbolTable* symbol_table;
 
     explicit Instance(BaseClass* cls) : cls(cls) {
-        this->type = ObjectType::Instance;
+        this->type         = ObjectType::Instance;
         this->symbol_table = new SymbolTable(cls->symbol_table);
         this->symbol_table->set("$this", this);
 
@@ -28,15 +29,15 @@ struct Instance : public Object {
             }
         } else {
             if(this->item_exists("__string")) {
-                auto* func_o = static_cast<BaseFunction*>(this->symbol_table->get("__string"));
+                auto* func_o = static_cast<BaseFunction*>(
+                    this->symbol_table->get("__string"));
                 func_o->set_context(this->context);
 
                 if(func_o->func_type == FunctionType::UserDefined) {
-                    auto* func = static_cast<Function*>(func_o);
-                    auto result = func->operator()({});
+                    auto* func   = static_cast<Function*>(func_o);
+                    auto  result = func->operator()({});
 
-                    if(result.error.has_value())
-                        return "<error>";
+                    if(result.error.has_value()) return "<error>";
 
                     return result.value.value()->print_friendly();
                 }
@@ -44,7 +45,8 @@ struct Instance : public Object {
         }
 
         std::stringstream str;
-        str << "<" << this->cls->name << " at address 0x" << std::hex << std::setw(sizeof(size_t)) << std::setfill('0') << this << ">";
+        str << "<" << this->cls->name << " at address 0x" << std::hex
+            << std::setw(sizeof(size_t)) << std::setfill('0') << this << ">";
 
         return str.str();
     }
@@ -60,24 +62,24 @@ struct Instance : public Object {
     RuntimeResult construct(std::vector<Object*> args) {
         RuntimeResult result;
 
-        auto* context = new Context("<constructor>");
+        auto* context         = new Context("<constructor>");
         context->symbol_table = this->symbol_table;
-        context->parent = this->context;
+        context->parent       = this->context;
 
         if(this->cls->symbol_table->exists("__constructor")) {
-            auto* func_o = static_cast<BaseFunction*>(this->cls->symbol_table->get("__constructor"));
+            auto* func_o = static_cast<BaseFunction*>(
+                this->cls->symbol_table->get("__constructor"));
             func_o->set_context(context);
 
             if(func_o->func_type == FunctionType::UserDefined) {
                 auto* func = static_cast<Function*>(func_o);
-                result = func->operator()(args);
+                result     = func->operator()(args);
             } else {
                 auto* func = static_cast<BuiltInFunction*>(func_o);
-                result = func->operator()(args);
+                result     = func->operator()(args);
             }
 
-            if(result.error.has_value())
-                return result;
+            if(result.error.has_value()) return result;
         }
 
         return *result.success(this);
@@ -91,7 +93,7 @@ struct Instance : public Object {
         return Object::is_true();
     }
 
-    ObjectResult operator+(Object &other) override {
+    ObjectResult operator+(Object& other) override {
         if(this->cls->cls_type != BuiltInType::UserCreated) {
             return this->cls->operator+(other);
         }
@@ -99,7 +101,7 @@ struct Instance : public Object {
         return Object::operator+(other);
     }
 
-    ObjectResult operator-(Object &other) override {
+    ObjectResult operator-(Object& other) override {
         if(this->cls->cls_type != BuiltInType::UserCreated) {
             return this->cls->operator-(other);
         }
@@ -107,7 +109,7 @@ struct Instance : public Object {
         return Object::operator-(other);
     }
 
-    ObjectResult operator*(Object &other) override {
+    ObjectResult operator*(Object& other) override {
         if(this->cls->cls_type != BuiltInType::UserCreated) {
             return this->cls->operator*(other);
         }
@@ -115,7 +117,7 @@ struct Instance : public Object {
         return Object::operator*(other);
     }
 
-    ObjectResult operator/(Object &other) override {
+    ObjectResult operator/(Object& other) override {
         if(this->cls->cls_type != BuiltInType::UserCreated) {
             return this->cls->operator/(other);
         }
@@ -123,7 +125,7 @@ struct Instance : public Object {
         return Object::operator/(other);
     }
 
-    ObjectResult logical_and(Object &other) override {
+    ObjectResult logical_and(Object& other) override {
         if(this->cls->cls_type != BuiltInType::UserCreated) {
             return this->cls->logical_and(other);
         }
@@ -131,7 +133,7 @@ struct Instance : public Object {
         return Object::logical_and(other);
     }
 
-    ObjectResult logical_or(Object &other) override {
+    ObjectResult logical_or(Object& other) override {
         if(this->cls->cls_type != BuiltInType::UserCreated) {
             return this->cls->logical_or(other);
         }
@@ -147,7 +149,7 @@ struct Instance : public Object {
         return Object::logical_not();
     }
 
-    ObjectResult power_by(Object &other) override {
+    ObjectResult power_by(Object& other) override {
         if(this->cls->cls_type != BuiltInType::UserCreated) {
             return this->cls->power_by(other);
         }
@@ -155,7 +157,7 @@ struct Instance : public Object {
         return Object::power_by(other);
     }
 
-    ObjectResult operator<(Object &other) override {
+    ObjectResult operator<(Object& other) override {
         if(this->cls->cls_type != BuiltInType::UserCreated) {
             return this->cls->operator<(other);
         }
@@ -163,7 +165,7 @@ struct Instance : public Object {
         return Object::operator<(other);
     }
 
-    ObjectResult operator<=(Object &other) override {
+    ObjectResult operator<=(Object& other) override {
         if(this->cls->cls_type != BuiltInType::UserCreated) {
             return this->cls->operator<=(other);
         }
@@ -171,7 +173,7 @@ struct Instance : public Object {
         return Object::operator<=(other);
     }
 
-    ObjectResult operator>(Object &other) override {
+    ObjectResult operator>(Object& other) override {
         if(this->cls->cls_type != BuiltInType::UserCreated) {
             return this->cls->operator>(other);
         }
@@ -179,7 +181,7 @@ struct Instance : public Object {
         return Object::operator>(other);
     }
 
-    ObjectResult operator>=(Object &other) override {
+    ObjectResult operator>=(Object& other) override {
         if(this->cls->cls_type != BuiltInType::UserCreated) {
             return this->cls->operator>=(other);
         }
@@ -187,7 +189,7 @@ struct Instance : public Object {
         return Object::operator>=(other);
     }
 
-    ObjectResult operator==(Object &other) override {
+    ObjectResult operator==(Object& other) override {
         if(this->cls->cls_type != BuiltInType::UserCreated) {
             return this->cls->operator==(other);
         }
@@ -195,7 +197,7 @@ struct Instance : public Object {
         return Object::operator==(other);
     }
 
-    ObjectResult operator!=(Object &other) override {
+    ObjectResult operator!=(Object& other) override {
         if(this->cls->cls_type != BuiltInType::UserCreated) {
             return this->cls->operator!=(other);
         }

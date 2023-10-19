@@ -6,7 +6,7 @@
 struct BooleanClass : public BuiltInClass {
     bool value;
 
-    static Instance *new_instance(bool initial_value);
+    static Instance* new_instance(bool initial_value);
 
     explicit BooleanClass(bool initial_value);
 
@@ -14,26 +14,30 @@ struct BooleanClass : public BuiltInClass {
         return value ? "true" : "false";
     }
 
-    bool is_true() override {
-        return this->value;
-    }
+    bool is_true() override { return this->value; }
 
-    ObjectResult logical_and(Object &other) override {
+    ObjectResult logical_and(Object& other) override {
         if(other.type == ObjectType::Instance) {
             auto* instance = dynamic_cast<Instance*>(&other);
             if(instance->cls->cls_type == BuiltInType::Boolean) {
-                return {BooleanClass::new_instance(this->value && dynamic_cast<BooleanClass*>(instance->cls)->value), std::nullopt};
+                return { BooleanClass::new_instance(
+                             this->value &&
+                             dynamic_cast<BooleanClass*>(instance->cls)->value),
+                         std::nullopt };
             }
         }
 
         return Object::logical_and(other);
     }
 
-    ObjectResult logical_or(Object &other) override {
+    ObjectResult logical_or(Object& other) override {
         if(other.type == ObjectType::Instance) {
             auto* instance = dynamic_cast<Instance*>(&other);
             if(instance->cls->cls_type == BuiltInType::Boolean) {
-                return {BooleanClass::new_instance(this->value || dynamic_cast<BooleanClass*>(instance->cls)->value), std::nullopt};
+                return { BooleanClass::new_instance(
+                             this->value ||
+                             dynamic_cast<BooleanClass*>(instance->cls)->value),
+                         std::nullopt };
             }
         }
 
@@ -41,6 +45,6 @@ struct BooleanClass : public BuiltInClass {
     }
 
     ObjectResult logical_not() override {
-        return {BooleanClass::new_instance(!this->value), std::nullopt};
+        return { BooleanClass::new_instance(!this->value), std::nullopt };
     }
 };
