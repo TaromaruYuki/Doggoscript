@@ -98,7 +98,9 @@ const std::vector<std::string> keywords = {
         "continue",
         "break",
         "class",
-        "incl"
+        "incl",
+        "try",
+        "catch"
 };
 
 struct Token {
