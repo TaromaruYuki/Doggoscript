@@ -187,6 +187,12 @@ RuntimeResult Interpreter::visit_BinaryOperationNode(BinaryOperationNode* node,
         case TokenType::NotEquals: {
             obj_result = *left != *right;
         } break;
+        default: {
+            std::cerr << "Could not visit binary operation node '"
+                      << type_to_str.at(node->token->type) << "'"
+                      << std::endl;
+            exit(EXIT_FAILURE);
+        }
     }
 
     if(std::get<1>(obj_result.value()).has_value())

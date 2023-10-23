@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(doggoscript VERSION 0.3.0 DESCRIPTION "A programming language created in C++")
+project(doggoscript VERSION 0.4.0 DESCRIPTION "A programming language created in C++")
 
 set("IS_DEBUG" 0)
 

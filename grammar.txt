@@ -107,3 +107,12 @@ Syntax:
         $person->hello()
         $person->birthday()
         $person->hello()
+
+    Try Catch:
+        try {
+            1 / 0
+        } except($err) {
+            print($err->$name)
+            print($err->$details)
+            print($err)
+        }
