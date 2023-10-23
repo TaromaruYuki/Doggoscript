@@ -3,6 +3,7 @@
 #include "position.hpp"
 
 #include <map>
+#include <optional>
 #include <string>
 
 struct Object;
