@@ -1,28 +1,31 @@
 #pragma once
 
-#include <string>
-#include <utility>
-#include <vector>
-#include <iostream>
-#include <optional>
-#include <tuple>
-#include "token.hpp"
 #include "error.hpp"
 #include "position.hpp"
+#include "token.hpp"
+
+#include <iostream>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 struct LexerResult {
     std::optional<std::vector<Token>> tokens;
-    std::optional<BaseError> error;
+    std::optional<BaseError>          error;
 };
 
 class Lexer {
-    Position position;
+    Position    position;
     std::string src;
-    char current_character = '\0';
+    char        current_character = '\0';
 
     void advance();
 
-    std::tuple<std::optional<Token>, std::optional<Token>, std::optional<BaseError>> create_number();
+    std::tuple<std::optional<Token>, std::optional<Token>,
+               std::optional<BaseError>>
+        create_number();
 
     Token create_power();
 
@@ -46,9 +49,9 @@ class Lexer {
 
     std::optional<Token> create_div_or_comment();
 
-public:
-    explicit Lexer(std::string file_name, std::string src)
-            : src(std::move(src)), position(std::move(file_name), src) {
+  public:
+    explicit Lexer(std::string file_name, std::string src) :
+        src(std::move(src)), position(std::move(file_name), src) {
         this->advance();
     }
 

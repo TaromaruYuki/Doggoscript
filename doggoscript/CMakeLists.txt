@@ -26,6 +26,7 @@ set(DS_SOURCES
     src/types/classes/list_class.cpp
     src/types/classes/dict_class.cpp
     src/types/classes/boolean_class.cpp
+        src/types/classes/error_class.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${DS_SOURCES})

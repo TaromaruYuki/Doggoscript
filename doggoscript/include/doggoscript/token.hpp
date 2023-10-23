@@ -1,19 +1,19 @@
 #pragma once
 
 #include <config/DoggoscriptConfig.h>
-#include <string>
 #include <sstream>
+#include <string>
 
 #ifdef HAVE_FORMAT
-#include <format>
+    #include <format>
 #endif
 
-#include <utility>
+#include "position.hpp"
+
 #include <optional>
 #include <unordered_map>
+#include <utility>
 #include <vector>
-
-#include "position.hpp"
 
 enum class TokenType {
     FileEnd = -1,
@@ -50,67 +50,54 @@ enum class TokenType {
 };
 
 const std::unordered_map<TokenType, std::string> type_to_str = {
-        {TokenType::FileEnd,           "EOF"},
-        {TokenType::Int,               "Int"},
-        {TokenType::Float,             "Float"},
-        {TokenType::Plus,              "Plus"},
-        {TokenType::Minus,             "Minus"},
-        {TokenType::Multiply,          "Multiply"},
-        {TokenType::Divide,            "Divide"},
-        {TokenType::LParen,            "LParen"},
-        {TokenType::RParen,            "RParen"},
-        {TokenType::Power,             "Power"},
-        {TokenType::Variable,          "Variable"},
-        {TokenType::Identifier,        "Identifier"},
-        {TokenType::Keyword,           "Keyword"},
-        {TokenType::EqualsTo,          "EqualsTo"},
-        {TokenType::NotEquals,         "NotEquals"},
-        {TokenType::GreaterThan,       "GreaterThan"},
-        {TokenType::LessThan,          "LessThan"},
-        {TokenType::GreaterThanEquals, "GreaterThanEquals"},
-        {TokenType::LessThanEquals,    "LessThanEquals"},
-        {TokenType::LogicalAnd,        "LogicalAnd"},
-        {TokenType::LogicalOr,         "LogicalOr"},
-        {TokenType::LogicalNot,        "LogicalNot"},
-        {TokenType::LCurly,            "LCurly"},
-        {TokenType::RCurly,            "RCurly"},
-        {TokenType::Through,           "Through"},
-        {TokenType::Comma,             "Comma"},
-        {TokenType::String,            "String"},
-        {TokenType::LSquare,           "LSquare"},
-        {TokenType::RSquare,           "RSquare"},
-        {TokenType::NewLine,           "NewLine"},
-        {TokenType::Arrow,             "Arrow"},
+    { TokenType::FileEnd, "EOF" },
+    { TokenType::Int, "Int" },
+    { TokenType::Float, "Float" },
+    { TokenType::Plus, "Plus" },
+    { TokenType::Minus, "Minus" },
+    { TokenType::Multiply, "Multiply" },
+    { TokenType::Divide, "Divide" },
+    { TokenType::LParen, "LParen" },
+    { TokenType::RParen, "RParen" },
+    { TokenType::Power, "Power" },
+    { TokenType::Variable, "Variable" },
+    { TokenType::Identifier, "Identifier" },
+    { TokenType::Keyword, "Keyword" },
+    { TokenType::EqualsTo, "EqualsTo" },
+    { TokenType::NotEquals, "NotEquals" },
+    { TokenType::GreaterThan, "GreaterThan" },
+    { TokenType::LessThan, "LessThan" },
+    { TokenType::GreaterThanEquals, "GreaterThanEquals" },
+    { TokenType::LessThanEquals, "LessThanEquals" },
+    { TokenType::LogicalAnd, "LogicalAnd" },
+    { TokenType::LogicalOr, "LogicalOr" },
+    { TokenType::LogicalNot, "LogicalNot" },
+    { TokenType::LCurly, "LCurly" },
+    { TokenType::RCurly, "RCurly" },
+    { TokenType::Through, "Through" },
+    { TokenType::Comma, "Comma" },
+    { TokenType::String, "String" },
+    { TokenType::LSquare, "LSquare" },
+    { TokenType::RSquare, "RSquare" },
+    { TokenType::NewLine, "NewLine" },
+    { TokenType::Arrow, "Arrow" },
 };
 
 const std::vector<std::string> keywords = {
-        "val",
-        "is",
-        "true",
-        "false",
-        "if",
-        "else",
-        "for",
-        "while",
-        "in",
-        "fn",
-        "return",
-        "continue",
-        "break",
-        "class",
-        "incl"
+    "val", "is",     "true",     "false", "if",    "else", "for", "while", "in",
+    "fn",  "return", "continue", "break", "class", "incl", "try", "catch"
 };
 
 struct Token {
-    TokenType type;
-    std::string value;
+    TokenType               type;
+    std::string             value;
     std::optional<Position> start_pos;
     std::optional<Position> end_pos;
 
-    Token(TokenType type, std::optional<std::string> value, std::optional<Position> start_pos,
-          std::optional<Position> end_pos);
+    Token(TokenType type, std::optional<std::string> value,
+          std::optional<Position> start_pos, std::optional<Position> end_pos);
 
-    [[nodiscard]] bool is_keyword(const std::string &keyword);
+    [[nodiscard]] bool is_keyword(const std::string& keyword);
 
     [[nodiscard]] std::string str() const;
 };
