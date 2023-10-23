@@ -4,7 +4,7 @@
 #include "function.hpp"
 #include "object.hpp"
 
-enum class BuiltInType { UserCreated, String, Number, Boolean, List, Dict };
+enum class BuiltInType { UserCreated, String, Number, Boolean, List, Dict, Error };
 
 struct BaseClass : public Object {
     std::string  name;

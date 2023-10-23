@@ -991,6 +991,7 @@ ParseResult Parser::class_def() {
 
 ParseResult Parser::try_catch() {
     ParseResult result;
+    Position start_pos(this->current_token.value().start_pos.value());
 
     if(!this->current_token.value().is_keyword("try")) {
         return *result.failure(InvalidSyntaxError(
@@ -1085,5 +1086,5 @@ ParseResult Parser::try_catch() {
     result.register_advancement();
     this->advance();
 
-    return *result.success(new TryCatchNode(try_body, variable_token, catch_body));
+    return *result.success(new TryCatchNode(try_body, variable_token, catch_body, start_pos, this->current_token.value().end_pos.value()));
 }

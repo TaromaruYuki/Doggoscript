@@ -125,4 +125,6 @@ class Interpreter {
                                             Context&             context);
 
     RuntimeResult visit_IncludeNode(IncludeNode* node, Context& context);
+
+    RuntimeResult visit_TryCatchNode(TryCatchNode* node, Context& context);
 };

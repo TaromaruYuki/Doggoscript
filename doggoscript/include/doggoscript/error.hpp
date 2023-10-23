@@ -14,10 +14,10 @@
 class BaseError {
     Position    start_pos;
     Position    end_pos;
-    std::string details;
 
   public:
     std::string error_name;
+    std::string details;
     BaseError(Position start_pos, Position end_pos, std::string error_name,
               std::string details) :
         start_pos(start_pos),

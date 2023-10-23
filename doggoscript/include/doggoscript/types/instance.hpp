@@ -15,9 +15,7 @@ struct Instance : public Object {
         this->symbol_table->set("$this", this);
 
         for(auto& [key, value] : cls->symbol_table->symbols) {
-            if(value->type == ObjectType::Function) {
-                this->symbol_table->set_local(key, value);
-            }
+            this->symbol_table->set_local(key, value);
         }
     }
 

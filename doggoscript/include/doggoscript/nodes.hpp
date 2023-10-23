@@ -388,13 +388,13 @@ struct TryCatchNode : public BaseNode {
     BaseNode* try_body;
     BaseNode* catch_body;
 
-    TryCatchNode(BaseNode* try_body, Token& var, BaseNode* catch_body) :
+    TryCatchNode(BaseNode* try_body, Token& var, BaseNode* catch_body, Position& start_pos, Position& end_pos) :
         BaseNode() {
         this->type = NodeType::TryCatchNode;
         this->try_body = try_body;
         this->token = new Token(var);
         this->catch_body = catch_body;
-        this->start_pos = try_body->start_pos;
-        this->end_pos = catch_body->end_pos;
+        this->start_pos = new Position(start_pos);
+        this->end_pos = new Position(end_pos);
     }
 };

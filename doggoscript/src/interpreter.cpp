@@ -65,6 +65,8 @@ RuntimeResult Interpreter::visit(BaseNode* node, Context& context) {
         case NodeType::IncludeNode:
             return this->visit_IncludeNode(static_cast<IncludeNode*>(node),
                                            context);
+        case NodeType::TryCatchNode:
+            return this->visit_TryCatchNode(static_cast<TryCatchNode*>(node), context);
         default: {
             std::cerr << "Could not visit node '"
                       << node_type_to_str.at(node->type) << "'" << std::endl;
@@ -334,7 +336,7 @@ RuntimeResult Interpreter::visit_VariableAccessNode(VariableAccessNode* node,
                                  instance->symbol_table->get_local(name->value))
                            : nullptr;
 
-            if(instance == nullptr && i != node->children.size() - 1)
+            if(instance == nullptr && i == node->children.size() - 1)
                 return *result.failure(
                     NameError(*node->start_pos, *node->end_pos,
                               "Variable '" + name->value + "' is not defined"));
@@ -738,4 +740,28 @@ RuntimeResult Interpreter::visit_IncludeNode(IncludeNode* node,
         return *result.failure(ds_result.error.value());
 
     return *result.success(nullptr);
+}
+RuntimeResult Interpreter::visit_TryCatchNode(TryCatchNode* node,
+                                              Context&      context) {
+    RuntimeResult result;
+
+    std::optional<Object*> try_result = result.reg(this->visit(node->try_body, context));
+    bool should_catch = result.should_return();
+
+    if(should_catch) {
+        Context       catch_context("");
+        auto*         catch_symbol_table = new SymbolTable(context.symbol_table);
+        catch_context.symbol_table       = catch_symbol_table;
+        catch_symbol_table->set(node->token->value, ErrorClass::new_instance(result.error.value()));
+
+        result.reset();
+        result.error = std::nullopt;
+
+        std::optional<Object*> catch_result = result.reg(this->visit(node->catch_body, catch_context));
+        if(result.should_return()) return result;
+
+        return *result.success(catch_result.value());
+    }
+
+    return *result.success(try_result.value());
 }
