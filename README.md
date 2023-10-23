@@ -19,7 +19,7 @@
 - [X] Scopes (outside a function)
 - [X] Classes
 - [X] Modules
-- [ ] Error Handling
+- [X] Error Handling
 - [X] Maps / Dicts
 - [X] File IO
 
