@@ -37,6 +37,7 @@ enum class NodeType {
     BreakNode,                // Done
     ClassDefinitionNode,      // Done
     IncludeNode,              // Done
+    TryCatchNode,             // Not Done
 };
 
 const std::unordered_map<NodeType, std::string> node_type_to_str = {
@@ -62,6 +63,7 @@ const std::unordered_map<NodeType, std::string> node_type_to_str = {
     { NodeType::BreakNode, "BreakNode" },
     { NodeType::ClassDefinitionNode, "ClassDefinitionNode" },
     { NodeType::IncludeNode, "IncludeNode" },
+    { NodeType::TryCatchNode, "TryCatchNode" },
 };
 
 struct BaseNode {
@@ -379,5 +381,20 @@ struct IncludeNode : public BaseNode {
         this->path      = path.value;
         this->start_pos = new Position(start_pos);
         this->end_pos   = new Position(end_pos);
+    }
+};
+
+struct TryCatchNode : public BaseNode {
+    BaseNode* try_body;
+    BaseNode* catch_body;
+
+    TryCatchNode(BaseNode* try_body, Token& var, BaseNode* catch_body) :
+        BaseNode() {
+        this->type = NodeType::TryCatchNode;
+        this->try_body = try_body;
+        this->token = new Token(var);
+        this->catch_body = catch_body;
+        this->start_pos = try_body->start_pos;
+        this->end_pos = catch_body->end_pos;
     }
 };

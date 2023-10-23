@@ -97,6 +97,8 @@ class Parser {
 
     ParseResult class_def();
 
+    ParseResult try_catch();
+
     ParseResult bin_op(
         const std::function<ParserFunction>& func, std::vector<TokenType> ops,
         std::optional<std::function<ParserFunction>> func2 = std::nullopt);

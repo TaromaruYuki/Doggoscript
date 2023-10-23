@@ -424,6 +424,11 @@ ParseResult Parser::atom() {
         if(result.should_return()) return result;
 
         return *result.success(class_expr);
+    } else if(value.is_keyword("try")) {
+        BaseNode* try_expr = result.reg(this->try_catch());
+        if(result.should_return()) return result;
+
+        return *result.success(try_expr);
     }
 
     return *result.failure(InvalidSyntaxError(
@@ -982,4 +987,103 @@ ParseResult Parser::class_def() {
     return *result.success(
         new ClassDefinitionNode(class_name_token, body, start_pos,
                                 this->current_token.value().end_pos.value()));
+}
+
+ParseResult Parser::try_catch() {
+    ParseResult result;
+
+    if(!this->current_token.value().is_keyword("try")) {
+        return *result.failure(InvalidSyntaxError(
+            this->current_token.value().start_pos.value(),
+            this->current_token.value().end_pos.value(), "Expected 'try'"));
+    }
+
+    result.register_advancement();
+    this->advance();
+
+    if(this->current_token.value().type != TokenType::LCurly) {
+        return *result.failure(InvalidSyntaxError(
+            this->current_token.value().start_pos.value(),
+            this->current_token.value().end_pos.value(), "Expected '{'"));
+    }
+
+    result.register_advancement();
+    this->advance();
+
+    BaseNode* try_body = result.reg(this->statements());
+    if(result.should_return()) return result;
+
+    if(this->current_token.value().type != TokenType::RCurly) {
+        return *result.failure(
+            InvalidSyntaxError(this->current_token.value().start_pos.value(),
+                               this->current_token.value().end_pos.value(),
+                               "Expected '}' or 'catch'"));
+    }
+
+    result.register_advancement();
+    this->advance();
+
+    if(!this->current_token.value().is_keyword("catch")) {
+        return *result.failure(InvalidSyntaxError(
+            this->current_token.value().start_pos.value(),
+            this->current_token.value().end_pos.value(), "Expected 'catch'"));
+    }
+
+    result.register_advancement();
+    this->advance();
+
+    if(this->current_token.value().type != TokenType::LParen) {
+        return *result.failure(InvalidSyntaxError(
+            this->current_token.value().start_pos.value(),
+            this->current_token.value().end_pos.value(), "Expected '('"));
+    }
+
+    result.register_advancement();
+    this->advance();
+
+    if(this->current_token.value().type != TokenType::Variable) {
+        return *result.failure(
+            InvalidSyntaxError(this->current_token.value().start_pos.value(),
+                               this->current_token.value().end_pos.value(),
+                               "Expected variable name"));
+    }
+
+    Token variable_token = this->current_token.value();
+    result.register_advancement();
+    this->advance();
+
+    if(this->current_token.value().type != TokenType::RParen) {
+            return *result.failure(InvalidSyntaxError(
+            this->current_token.value().start_pos.value(),
+            this->current_token.value().end_pos.value(),
+            "Expected ')' or variable name"));
+    }
+
+    result.register_advancement();
+    this->advance();
+
+    if(this->current_token.value().type != TokenType::LCurly) {
+        return *result.failure(InvalidSyntaxError(
+            this->current_token.value().start_pos.value(),
+            this->current_token.value().end_pos.value(),
+            "Expected '{'"));
+    }
+
+    result.register_advancement();
+    this->advance();
+
+    BaseNode* catch_body = result.reg(this->statements());
+    if(result.should_return()) return result;
+
+    if(this->current_token.value().type != TokenType::RCurly) {
+            return *result.failure(InvalidSyntaxError(
+            this->current_token.value().start_pos.value(),
+            this->current_token.value().end_pos.value(),
+            "Expected '}'"));
+    }
+
+    result.register_advancement();
+    this->advance();
+
+    return *result.success(new TryCatchNode(try_body, variable_token, catch_body));
 }
